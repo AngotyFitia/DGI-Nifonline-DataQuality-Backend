@@ -1,0 +1,58 @@
+HELP.md
+
+### Maven ###
+target/
+.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.properties
+
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### Spring Boot config ###
+application.properties
+application.yml
+application.yaml
+application-*.yml
+
+### Logs ###
+*.log
+logs/
+
+### Java ###
+*.class
+*.jar
+*.war
+*.ear
+
+### Test ###
+/target-surefire-reports/
+
+### IDE ###
+.idea
+*.iws
+*.iml
+*.ipr
+.classpath
+.project
+.factorypath
+.settings
+.springBeans
+.sts4-cache
+
+### VS Code ###
+.vscode/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+/build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### Windows ###
+Thumbs.db
+ehthumbs.db
+Desktop.ini
