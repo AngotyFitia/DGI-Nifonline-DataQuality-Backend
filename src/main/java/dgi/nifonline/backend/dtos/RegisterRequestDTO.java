@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Pattern;
 
 @Getter @Setter
 public class RegisterRequestDTO {
+    
     @NotBlank @Email
     private String email;
 
