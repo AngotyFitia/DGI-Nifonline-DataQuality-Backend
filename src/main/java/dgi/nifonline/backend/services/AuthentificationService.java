@@ -9,6 +9,8 @@ import dgi.nifonline.backend.models.Utilisateur;
 import dgi.nifonline.backend.repositories.UtilisateurRepository;
 import dgi.nifonline.backend.utils.JWTUtil;
 import dgi.nifonline.backend.utils.ReCaptcha;
+import org.springframework.beans.factory.annotation.Value;
+
 
 @Service
 public class AuthentificationService {
@@ -16,7 +18,9 @@ public class AuthentificationService {
     private final PasswordEncoder passwordEncoder;
     private final JWTUtil jwtUtil;
     private final ReCaptcha reCaptcha;
-    private final String pepper = "SecretPepperKey123!"; 
+
+    @Value("${pepper}")
+    private String pepper;
 
     public AuthentificationService(UtilisateurRepository utilisateurRepository, PasswordEncoder passwordEncoder, JWTUtil jwtUtil, ReCaptcha reCaptcha) {
         this.utilisateurRepository = utilisateurRepository;
