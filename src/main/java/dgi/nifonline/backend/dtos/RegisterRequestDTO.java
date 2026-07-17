@@ -10,14 +10,16 @@ import jakarta.validation.constraints.Pattern;
 @Getter @Setter
 public class RegisterRequestDTO {
     
-    @NotBlank @Email
+    @NotBlank(message="L'adresse email est obligatoire") 
+    @Email(message="Veuillez entrer une adresse email valide")
     private String email;
 
-    @NotBlank
+    @NotBlank(message="Le mot de passe est obligatoire")
     @Size(min = 12, message = "Password must be at least 12 characters")
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=!]).*$",
-             message = "Password must contain upper, lower, digit, and special character")
+             message = "Votre mot de passe doit contenir au moins une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial")
     private String motDePasse;
 
+    @NotBlank(message= "Veuillez confirmer que vous n'êtes pas un robot")
     private String recaptchaToken;
 }
