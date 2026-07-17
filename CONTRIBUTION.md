@@ -13,3 +13,13 @@ Ce document retrace l'évolution du projet DGI et les principales contributions 
   - Implémentation de la gestion de sécurisation(recaptcha pour la vérification humaine)
 
 - Lien : https://github.com/AngotyFitia/DGI-Nifonline-DataQuality-Backend/pull/1
+
+
+## PR #2 - Déploiement
+
+- Description :
+  - Ajout du fichier Dockerfile pour la conteneurisation du projet
+
+- Lien : https://github.com/AngotyFitia/DGI-Nifonline-DataQuality-Backend/pull/2
+
+
