@@ -22,4 +22,11 @@ Ce document retrace l'évolution du projet DGI et les principales contributions 
 
 - Lien : https://github.com/AngotyFitia/DGI-Nifonline-DataQuality-Backend/pull/2
 
+## PR #3 - Exceptions
+
+- Description :
+  - Ajout des messages d'erreurs pour les champs nulls
+
+- Lien : https://github.com/AngotyFitia/DGI-Nifonline-DataQuality-Backend/pull/3
+
 
