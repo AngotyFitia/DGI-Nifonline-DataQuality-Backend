@@ -20,22 +20,15 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthenticationFilter jwtFilter) throws Exception {
         http
-            .cors(cors -> cors.configurationSource(request -> {
-                CorsConfiguration config = new CorsConfiguration();
-                config.setAllowedOrigins(List.of("http://localhost:5173", "https://dgi.nifonline.mg"));
-                config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-                config.setAllowedHeaders(List.of("*"));
-                config.setAllowCredentials(true);
-                return config;
-            }))
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/**").permitAll()
                 .anyRequest().authenticated()
             )
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+            .addFilterBefore(jwtFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 

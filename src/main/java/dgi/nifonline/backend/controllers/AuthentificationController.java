@@ -10,6 +10,8 @@ import jakarta.validation.Valid;
 import dgi.nifonline.backend.dtos.RegisterRequestDTO; 
 import dgi.nifonline.backend.dtos.LoginRequestDTO; 
 import dgi.nifonline.backend.services.AuthentificationService; 
+import org.springframework.web.bind.annotation.RequestHeader;
+
 
 @RestController
 @RequestMapping("/auth")
@@ -29,4 +31,12 @@ public class AuthentificationController {
     public ResponseEntity<?> login(@RequestBody LoginRequestDTO request) {
         return ResponseEntity.ok(authService.login(request));
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        authService.logout(token);
+        return ResponseEntity.ok("Logged out successfully");
+    }
+
 }
