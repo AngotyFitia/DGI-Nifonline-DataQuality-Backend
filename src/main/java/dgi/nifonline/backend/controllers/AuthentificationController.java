@@ -6,20 +6,25 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody; 
 import org.springframework.http.ResponseEntity; 
 import jakarta.validation.Valid; 
-
 import dgi.nifonline.backend.dtos.RegisterRequestDTO; 
 import dgi.nifonline.backend.dtos.LoginRequestDTO; 
-import dgi.nifonline.backend.services.AuthentificationService; 
-import org.springframework.web.bind.annotation.RequestHeader;
+import dgi.nifonline.backend.dtos.UserResponseDTO;
+import dgi.nifonline.backend.services.AuthentificationService;
+import dgi.nifonline.backend.services.UserService;
 
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.GetMapping;
+import dgi.nifonline.backend.models.Utilisateur;
 
 @RestController
 @RequestMapping("/auth")
 public class AuthentificationController {
     private final AuthentificationService authService;
+    private final UserService userService;
 
-    public AuthentificationController(AuthentificationService authService) {
+    public AuthentificationController(AuthentificationService authService, UserService userService) {
         this.authService = authService;
+        this.userService = userService;
     }
 
     @PostMapping("/register")
@@ -37,6 +42,13 @@ public class AuthentificationController {
         String token = authHeader.replace("Bearer ", "");
         authService.logout(token);
         return ResponseEntity.ok("Logged out successfully");
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserResponseDTO> getCurrentUser(@RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        Utilisateur user = userService.getCurrentUser(token);
+        return ResponseEntity.ok(new UserResponseDTO(user));
     }
 
 }
