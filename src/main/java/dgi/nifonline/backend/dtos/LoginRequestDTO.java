@@ -6,9 +6,10 @@ import jakarta.validation.constraints.NotBlank;
 
 @Getter @Setter
 public class LoginRequestDTO {
-    @NotBlank(message = "Email is mandatory")
+    
+    @NotBlank(message = "L'adresse email est obligatoireL'adresse email est obligatoire")
     private String email;
 
-    @NotBlank(message = "Password is mandatory")
+    @NotBlank(message = "Le mot de passe est obligatoire")
     private String motDePasse;
 }
