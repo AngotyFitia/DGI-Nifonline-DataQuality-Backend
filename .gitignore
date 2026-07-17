@@ -17,7 +17,6 @@ build/
 # Ignore local config files (ne pas commit les secrets)
 application.properties
 application.yml
-application.yaml
 application-*.yml
 
 # --- Environment secrets ---
