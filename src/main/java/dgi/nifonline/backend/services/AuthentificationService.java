@@ -38,7 +38,6 @@ public class AuthentificationService {
     }
 
     private boolean matches(String rawPassword, String encodedPassword) {
-        System.out.println("Pepper: " + pepper);
         return passwordEncoder.matches(rawPassword + pepper, encodedPassword);
     }
 
