@@ -17,15 +17,16 @@ public class JWTUtil {
         return Keys.hmacShaKeyFor(secret.getBytes());
     }
 
-    public String generateToken(String email) {
+    public String generateToken(String email, String role) {
         return Jwts.builder()
             .setSubject(email)
+            .claim("role", role)
             .setIssuedAt(new Date())
-            .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1h
+            .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60))
             .signWith(getSigningKey())
             .compact();
     }
-
+    
     public String extractEmail(String token) {
         return Jwts.parserBuilder()
             .setSigningKey(getSigningKey())
@@ -34,4 +35,14 @@ public class JWTUtil {
             .getBody()
             .getSubject();
     }
+    
+    public String extractRole(String token) {
+        return Jwts.parserBuilder()
+            .setSigningKey(getSigningKey())
+            .build()
+            .parseClaimsJws(token)
+            .getBody()
+            .get("role", String.class);
+    }
+    
 }

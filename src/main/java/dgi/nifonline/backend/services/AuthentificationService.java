@@ -61,8 +61,8 @@ public class AuthentificationService {
             throw new RuntimeException("Invalid credentials");
         }
     
-        String token = jwtUtil.generateToken(user.getEmail());
-    
+        String role = user.getProfil().getIntitule();
+        String token = jwtUtil.generateToken(user.getEmail(), role);
         SessionToken session = new SessionToken();
         session.setToken(token);
         session.setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60));

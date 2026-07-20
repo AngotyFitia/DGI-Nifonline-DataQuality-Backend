@@ -24,14 +24,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.jwtUtil = jwtUtil;
         this.sessionTokenRepository = sessionTokenRepository;
     }
-
+    
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
-
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,FilterChain filterChain) throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
-
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.replace("Bearer ", "");
             if (!sessionTokenRepository.findByToken(token).isPresent()) {
@@ -41,7 +37,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
             try {
                 String email = jwtUtil.extractEmail(token);
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(email, null, List.of());
+                String role = jwtUtil.extractRole(token);
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken( email, null, List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority(role)));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (Exception e) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -52,4 +49,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
+
 }

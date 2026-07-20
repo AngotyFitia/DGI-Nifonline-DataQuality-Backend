@@ -10,7 +10,7 @@ import dgi.nifonline.backend.dtos.RegisterRequestDTO;
 import dgi.nifonline.backend.dtos.LoginRequestDTO; 
 import dgi.nifonline.backend.dtos.UserResponseDTO;
 import dgi.nifonline.backend.services.AuthentificationService;
-import dgi.nifonline.backend.services.UserService;
+import dgi.nifonline.backend.services.UtilisateurService;
 
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,11 +20,11 @@ import dgi.nifonline.backend.models.Utilisateur;
 @RequestMapping("/auth")
 public class AuthentificationController {
     private final AuthentificationService authService;
-    private final UserService userService;
+    private final UtilisateurService utilisateurService;
 
-    public AuthentificationController(AuthentificationService authService, UserService userService) {
+    public AuthentificationController(AuthentificationService authService, UtilisateurService utilisateurService) {
         this.authService = authService;
-        this.userService = userService;
+        this.utilisateurService = utilisateurService;
     }
 
     @PostMapping("/register")
@@ -47,7 +47,7 @@ public class AuthentificationController {
     @GetMapping("/me")
     public ResponseEntity<UserResponseDTO> getCurrentUser(@RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
-        Utilisateur user = userService.getCurrentUser(token);
+        Utilisateur user = utilisateurService.getCurrentUser(token);
         return ResponseEntity.ok(new UserResponseDTO(user));
     }
 
