@@ -22,4 +22,6 @@ public class RegisterRequestDTO {
 
     @NotBlank(message= "Veuillez confirmer que vous n'êtes pas un robot")
     private String recaptchaToken;
+
+    private Long idProfil;
 }
