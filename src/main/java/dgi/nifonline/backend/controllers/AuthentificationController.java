@@ -10,22 +10,33 @@ import dgi.nifonline.backend.dtos.RegisterRequestDTO;
 import dgi.nifonline.backend.dtos.LoginRequestDTO; 
 import dgi.nifonline.backend.dtos.UserResponseDTO;
 import dgi.nifonline.backend.dtos.ApiResponseDTO;
+import dgi.nifonline.backend.dtos.ProfilResponseDTO;
 import dgi.nifonline.backend.services.AuthentificationService;
 import dgi.nifonline.backend.services.UtilisateurService;
-
+import dgi.nifonline.backend.services.ProfilService;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.GetMapping;
 import dgi.nifonline.backend.models.Utilisateur;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/auth")
 public class AuthentificationController {
     private final AuthentificationService authService;
     private final UtilisateurService utilisateurService;
+    private final ProfilService profilService;
 
-    public AuthentificationController(AuthentificationService authService, UtilisateurService utilisateurService) {
+    public AuthentificationController(AuthentificationService authService, UtilisateurService utilisateurService, ProfilService profilService) {
         this.authService = authService;
         this.utilisateurService = utilisateurService;
+        this.profilService = profilService;
+    }
+
+    @GetMapping("/profils")
+    public ResponseEntity<List<ProfilResponseDTO>> getAllProfils() {
+        List<ProfilResponseDTO> profils = profilService.getProfilsAgentEtChef().stream().map(ProfilResponseDTO::new).collect(Collectors.toList());
+        return ResponseEntity.ok(profils);
     }
 
     @PostMapping("/register")
@@ -37,7 +48,6 @@ public class AuthentificationController {
             return ResponseEntity.badRequest().body(response);
         }
     }
-
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDTO request) {
