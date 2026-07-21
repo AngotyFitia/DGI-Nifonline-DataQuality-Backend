@@ -19,16 +19,20 @@ public class DataInitializer {
     @Value("${admin.password}")
     private String adminPassword;
 
+    @Value("${pepper}")
+    private String pepper;
+
     @Bean
     CommandLineRunner initData(UtilisateurRepository utilisateurRepository,
                                ProfilRepository profilRepository,
                                PasswordEncoder passwordEncoder) {
         return args -> {
-            Profil adminProfil = profilRepository.findByIntitule("administrateur") .orElseGet(() -> {
-            Profil p = new Profil(); 
-            p.setIntitule("administrateur");
-            return profilRepository.save(p);
-        });
+            Profil adminProfil = profilRepository.findByIntitule("administrateur")
+                    .orElseGet(() -> {
+                        Profil p = new Profil();
+                        p.setIntitule("administrateur");
+                        return profilRepository.save(p);
+                    });
 
             profilRepository.findByIntitule("chef").orElseGet(() -> {
                 Profil p = new Profil();
@@ -45,11 +49,11 @@ public class DataInitializer {
             if (utilisateurRepository.findByEmail(adminEmail).isEmpty()) {
                 Utilisateur admin = new Utilisateur();
                 admin.setEmail(adminEmail);
-                admin.setMotDePasse(passwordEncoder.encode(adminPassword));
+                admin.setMotDePasse(passwordEncoder.encode(adminPassword + pepper));
                 admin.setEtat(0);
                 admin.setProfil(adminProfil);
                 utilisateurRepository.save(admin);
-                System.out.println("Compte administrateur créé au démarrage");
+                System.out.println("Compte administrateur créé au démarrage avec mot de passe sécurisé");
             }
         };
     }

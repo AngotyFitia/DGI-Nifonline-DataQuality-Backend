@@ -5,6 +5,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import dgi.nifonline.backend.dtos.RegisterRequestDTO;
 import dgi.nifonline.backend.dtos.LoginRequestDTO;
 import dgi.nifonline.backend.dtos.TokenResponseDTO;
+import dgi.nifonline.backend.dtos.ApiResponseDTO;
 import dgi.nifonline.backend.models.Utilisateur;
 import dgi.nifonline.backend.models.Profil;
 import dgi.nifonline.backend.repositories.UtilisateurRepository;
@@ -45,36 +46,45 @@ public class AuthentificationService {
         return passwordEncoder.matches(rawPassword + pepper, encodedPassword);
     }
 
-    public String register(RegisterRequestDTO request) {
-        // if (!reCaptcha.validate(request.getRecaptchaToken())) {
-        //     throw new RuntimeException("Invalid captcha");
-        // }
-        Profil profil= profilRepository.findById(request.getIdProfil()).orElseThrow(() -> new RuntimeException("Profil not found"));
-        Utilisateur user= new Utilisateur();
+    public ApiResponseDTO register(RegisterRequestDTO request) {
+        if (!reCaptcha.validate(request.getRecaptchaToken())) {
+            return new ApiResponseDTO(false, "Veuillez actualiser la page et revérifier que vous êtes un humain.");
+        }
+    
+        if (utilisateurRepository.findByEmail(request.getEmail()).isPresent()) {
+            return new ApiResponseDTO(false, "Un utilisateur avec cet email existe déjà.");
+        }
+    
+        Profil profil = profilRepository.findById(request.getIdProfil()).orElseThrow(() -> new RuntimeException("Profil introuvable"));
+        Utilisateur user = new Utilisateur();
         user.setEmail(request.getEmail());
         user.setMotDePasse(encodePassword(request.getMotDePasse()));
         user.setEtat(0);
         user.setProfil(profil);
         utilisateurRepository.save(user);
-        return "User registered securely";
+    
+        return new ApiResponseDTO(true, "Compte créé avec succès !");
     }
-
+    
     public TokenResponseDTO login(LoginRequestDTO request) {
-        Utilisateur user= utilisateurRepository.findByEmail(request.getEmail()).orElseThrow(() -> new RuntimeException("Email ou mot de passe invalide."));
+        if (!reCaptcha.validate(request.getRecaptchaToken())) {
+            throw new RuntimeException("Veuillez confirmer que vous n'êtes pas un robot.");
+        }
+    
+        Utilisateur user = utilisateurRepository.findByEmail(request.getEmail()).orElseThrow(() -> new RuntimeException("Email ou mot de passe invalide."));
         if (!matches(request.getMotDePasse(), user.getMotDePasse())) {
             throw new RuntimeException("Email ou mot de passe invalide.");
         }
-    
-        String role= user.getProfil().getIntitule();
-        String token= jwtUtil.generateToken(user.getEmail(), role);
+        String role = user.getProfil().getIntitule();
+        String token = jwtUtil.generateToken(user.getEmail(), role);
         SessionToken session = new SessionToken();
         session.setToken(token);
         session.setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60));
         session.setUtilisateur(user);
         sessionTokenRepository.save(session);
-    
         return new TokenResponseDTO(token);
     }
+    
     
     public void logout(String token) {
         sessionTokenRepository.deleteByToken(token);

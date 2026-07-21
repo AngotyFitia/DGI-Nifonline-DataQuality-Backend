@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import dgi.nifonline.backend.dtos.RegisterRequestDTO; 
 import dgi.nifonline.backend.dtos.LoginRequestDTO; 
 import dgi.nifonline.backend.dtos.UserResponseDTO;
+import dgi.nifonline.backend.dtos.ApiResponseDTO;
 import dgi.nifonline.backend.services.AuthentificationService;
 import dgi.nifonline.backend.services.UtilisateurService;
 
@@ -28,12 +29,18 @@ public class AuthentificationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequestDTO request) {
-        return ResponseEntity.ok(authService.register(request));
+    public ResponseEntity<ApiResponseDTO> register(@Valid @RequestBody RegisterRequestDTO request) {
+        ApiResponseDTO response = authService.register(request);
+        if (response.isSuccess()) { 
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.badRequest().body(response);
+        }
     }
 
+
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequestDTO request) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDTO request) {
         return ResponseEntity.ok(authService.login(request));
     }
 

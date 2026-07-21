@@ -3,6 +3,7 @@ package dgi.nifonline.backend.dtos;
 import lombok.Getter;
 import lombok.Setter;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.Pattern;
@@ -15,12 +16,12 @@ public class RegisterRequestDTO {
     private String email;
 
     @NotBlank(message="Le mot de passe est obligatoire")
-    @Size(min = 12, message = "Password must be at least 12 characters")
+    @Size(min = 12, message = "Le mot de passe doit contenir au moins 12 caractères.")
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@#$%^&+=!]).*$",
              message = "Votre mot de passe doit contenir au moins une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial")
     private String motDePasse;
 
-    @NotBlank(message= "Veuillez confirmer que vous n'êtes pas un robot")
+    @NotEmpty(message = "Veuillez confirmer que vous n'êtes pas un robot.")
     private String recaptchaToken;
 
     private Long idProfil;
