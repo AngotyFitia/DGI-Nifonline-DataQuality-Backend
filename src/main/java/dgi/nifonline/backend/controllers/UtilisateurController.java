@@ -26,4 +26,10 @@ public class UtilisateurController {
         return utilisateurService.getAllUtilisateurs().stream().map(UtilisateursResponseDTO::new).toList();
     }
 
+    @PutMapping("/{id}/etat")
+    @PreAuthorize("hasAuthority('administrateur')")
+    public UtilisateursResponseDTO updateEtat(@PathVariable Long id, @RequestParam int etat) {
+        Utilisateur utilisateurAcces = utilisateurService.updateEtat(id, etat);
+        return new UtilisateursResponseDTO(utilisateurAcces);
+    }
 }

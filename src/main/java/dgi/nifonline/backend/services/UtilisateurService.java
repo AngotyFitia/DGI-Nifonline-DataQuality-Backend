@@ -23,5 +23,11 @@ public class UtilisateurService {
     public List<Utilisateur> getAllUtilisateurs() {
         return utilisateurRepository.findAll();
     }
+
+    public Utilisateur updateEtat(Long id, int nouvelEtat) {
+        Utilisateur user = utilisateurRepository.findById(id).orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+        user.setEtat(nouvelEtat); 
+        return utilisateurRepository.save(user);
+    }
 }
 

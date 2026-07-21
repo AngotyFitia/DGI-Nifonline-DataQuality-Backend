@@ -50,7 +50,7 @@ public class DataInitializer {
                 Utilisateur admin = new Utilisateur();
                 admin.setEmail(adminEmail);
                 admin.setMotDePasse(passwordEncoder.encode(adminPassword + pepper));
-                admin.setEtat(0);
+                admin.setEtat(10);
                 admin.setProfil(adminProfil);
                 utilisateurRepository.save(admin);
                 System.out.println("Compte administrateur créé au démarrage avec mot de passe sécurisé");
