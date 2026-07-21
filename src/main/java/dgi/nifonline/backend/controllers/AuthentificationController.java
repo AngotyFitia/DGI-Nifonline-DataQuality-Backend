@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import jakarta.validation.Valid; 
 import dgi.nifonline.backend.dtos.RegisterRequestDTO; 
 import dgi.nifonline.backend.dtos.LoginRequestDTO; 
-import dgi.nifonline.backend.dtos.UserResponseDTO;
+import dgi.nifonline.backend.dtos.UtilisateursResponseDTO;
 import dgi.nifonline.backend.dtos.ApiResponseDTO;
 import dgi.nifonline.backend.dtos.ProfilResponseDTO;
 import dgi.nifonline.backend.services.AuthentificationService;
@@ -62,10 +62,10 @@ public class AuthentificationController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserResponseDTO> getCurrentUser(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<UtilisateursResponseDTO> getCurrentUser(@RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
         Utilisateur user = utilisateurService.getCurrentUser(token);
-        return ResponseEntity.ok(new UserResponseDTO(user));
+        return ResponseEntity.ok(new UtilisateursResponseDTO(user));
     }
 
 }

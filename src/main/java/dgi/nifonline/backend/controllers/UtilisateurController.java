@@ -5,6 +5,7 @@ import dgi.nifonline.backend.repositories.UtilisateurRepository;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import dgi.nifonline.backend.services.UtilisateurService;
+import dgi.nifonline.backend.dtos.UtilisateursResponseDTO;
 import java.util.List;
 
 @RestController
@@ -21,7 +22,8 @@ public class UtilisateurController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('administrateur')")
-    public List<Utilisateur> getAllUtilisateurs() {
-        return utilisateurService.getAllUtilisateurs();
+    public List<UtilisateursResponseDTO> getAllUtilisateurs() {
+        return utilisateurService.getAllUtilisateurs().stream().map(UtilisateursResponseDTO::new).toList();
     }
+
 }
