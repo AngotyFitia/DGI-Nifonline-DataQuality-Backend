@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import dgi.nifonline.backend.services.UtilisateurService;
 import dgi.nifonline.backend.dtos.UtilisateursResponseDTO;
+import dgi.nifonline.backend.dtos.UtilisateurKpiDTO;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,4 +38,11 @@ public class UtilisateurController {
         Utilisateur utilisateurAcces = utilisateurService.updateEtat(id, etat);
         return new UtilisateursResponseDTO(utilisateurAcces);
     }
+
+    @GetMapping("/kpi")
+    @PreAuthorize("hasAuthority('administrateur')")
+    public UtilisateurKpiDTO getUtilisateurKpi() {
+        return utilisateurService.getUtilisateurKpi();
+    }
+
 }

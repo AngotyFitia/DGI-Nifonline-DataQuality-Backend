@@ -2,11 +2,12 @@ package dgi.nifonline.backend.services;
 import dgi.nifonline.backend.models.Utilisateur;
 import dgi.nifonline.backend.repositories.UtilisateurRepository;
 import dgi.nifonline.backend.utils.JWTUtil;
+import dgi.nifonline.backend.dtos.UtilisateurKpiDTO; 
 import org.springframework.stereotype.Service;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
+import java.time.LocalDateTime;
 
 @Service
 public class UtilisateurService {
@@ -60,12 +61,21 @@ public class UtilisateurService {
             default -> -1;
         };
     }
-    
 
     public Utilisateur updateEtat(Long id, int nouvelEtat) {
         Utilisateur user = utilisateurRepository.findById(id).orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
         user.setEtat(nouvelEtat); 
         return utilisateurRepository.save(user);
     }
+
+    public UtilisateurKpiDTO getUtilisateurKpi() {
+        UtilisateurKpiDTO dto = new UtilisateurKpiDTO();
+        dto.setTotal(utilisateurRepository.count());
+        dto.setActifs(utilisateurRepository.countByEtat(10));
+        dto.setInactifs(utilisateurRepository.countByEtat(5));
+        dto.setNouveaux7Jours(utilisateurRepository.countByDateCreationAfter(LocalDateTime.now().minusDays(7)));
+        return dto;
+    }
+    
 }
 

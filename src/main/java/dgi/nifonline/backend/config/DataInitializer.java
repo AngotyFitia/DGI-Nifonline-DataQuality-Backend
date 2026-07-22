@@ -9,6 +9,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.beans.factory.annotation.Value;
+import java.time.LocalDateTime;
+
 
 @Configuration
 public class DataInitializer {
@@ -52,6 +54,7 @@ public class DataInitializer {
                 admin.setMotDePasse(passwordEncoder.encode(adminPassword + pepper));
                 admin.setEtat(10);
                 admin.setProfil(adminProfil);
+                admin.setDateCreation(LocalDateTime.now());
                 utilisateurRepository.save(admin);
                 System.out.println("Compte administrateur créé au démarrage avec mot de passe sécurisé");
             }

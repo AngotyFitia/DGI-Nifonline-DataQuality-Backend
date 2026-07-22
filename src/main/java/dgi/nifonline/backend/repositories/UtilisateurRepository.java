@@ -7,9 +7,13 @@ import dgi.nifonline.backend.models.Utilisateur;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
+import java.time.LocalDateTime;
 
 @Repository
 public interface UtilisateurRepository extends JpaRepository<Utilisateur, Long> {
+    long count();
+    long countByEtat(int etat); 
+    long countByDateCreationAfter(LocalDateTime date);
     Optional<Utilisateur> findByEmail(String email);
 
     Page<Utilisateur> findByEmailContainingIgnoreCase(String email, Pageable pageable);
