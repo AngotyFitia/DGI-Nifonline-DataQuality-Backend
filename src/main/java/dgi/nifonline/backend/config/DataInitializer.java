@@ -55,6 +55,7 @@ public class DataInitializer {
                 admin.setEtat(10);
                 admin.setProfil(adminProfil);
                 admin.setDateCreation(LocalDateTime.now());
+                admin.setTentativesEchouees(0);
                 utilisateurRepository.save(admin);
                 System.out.println("Compte administrateur créé au démarrage avec mot de passe sécurisé");
             }
