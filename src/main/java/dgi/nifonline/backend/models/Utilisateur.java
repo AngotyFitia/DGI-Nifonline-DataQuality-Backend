@@ -10,6 +10,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name="utilisateur")
@@ -29,6 +30,9 @@ public class Utilisateur{
 
     @Column(name = "etat")
     private int etat;
+
+    @Column(name = "date_creation", nullable = false)
+    private LocalDateTime dateCreation;
 
     @ManyToOne
     @JoinColumn(name = "id_profil") 

@@ -29,4 +29,9 @@ Ce document retrace l'évolution du projet DGI et les principales contributions 
 
 - Lien : https://github.com/AngotyFitia/DGI-Nifonline-DataQuality-Backend/pull/3
 
+## PR #4 - Gestion des utilisateurs
+  - mise en place complète de la gestion des utilisateurs avec filtres, pagination, activation/désactivation, DTO enrichi, et ajout des KPI utilisateurs.
+
+- Lien : https://github.com/AngotyFitia/DGI-Nifonline-DataQuality-Backend/pull/4
+
 

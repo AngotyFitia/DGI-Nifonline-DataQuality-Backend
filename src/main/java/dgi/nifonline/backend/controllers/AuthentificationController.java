@@ -8,32 +8,49 @@ import org.springframework.http.ResponseEntity;
 import jakarta.validation.Valid; 
 import dgi.nifonline.backend.dtos.RegisterRequestDTO; 
 import dgi.nifonline.backend.dtos.LoginRequestDTO; 
-import dgi.nifonline.backend.dtos.UserResponseDTO;
+import dgi.nifonline.backend.dtos.UtilisateursResponseDTO;
+import dgi.nifonline.backend.dtos.ApiResponseDTO;
+import dgi.nifonline.backend.dtos.ProfilResponseDTO;
 import dgi.nifonline.backend.services.AuthentificationService;
-import dgi.nifonline.backend.services.UserService;
-
+import dgi.nifonline.backend.services.UtilisateurService;
+import dgi.nifonline.backend.services.ProfilService;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.GetMapping;
 import dgi.nifonline.backend.models.Utilisateur;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/auth")
 public class AuthentificationController {
     private final AuthentificationService authService;
-    private final UserService userService;
+    private final UtilisateurService utilisateurService;
+    private final ProfilService profilService;
 
-    public AuthentificationController(AuthentificationService authService, UserService userService) {
+    public AuthentificationController(AuthentificationService authService, UtilisateurService utilisateurService, ProfilService profilService) {
         this.authService = authService;
-        this.userService = userService;
+        this.utilisateurService = utilisateurService;
+        this.profilService = profilService;
+    }
+
+    @GetMapping("/profils")
+    public ResponseEntity<List<ProfilResponseDTO>> getAllProfils() {
+        List<ProfilResponseDTO> profils = profilService.getProfilsAgentEtChef().stream().map(ProfilResponseDTO::new).collect(Collectors.toList());
+        return ResponseEntity.ok(profils);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody RegisterRequestDTO request) {
-        return ResponseEntity.ok(authService.register(request));
+    public ResponseEntity<ApiResponseDTO> register(@Valid @RequestBody RegisterRequestDTO request) {
+        ApiResponseDTO response = authService.register(request);
+        if (response.isSuccess()) { 
+            return ResponseEntity.ok(response);
+        } else {
+            return ResponseEntity.badRequest().body(response);
+        }
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequestDTO request) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDTO request) {
         return ResponseEntity.ok(authService.login(request));
     }
 
@@ -45,10 +62,10 @@ public class AuthentificationController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserResponseDTO> getCurrentUser(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<UtilisateursResponseDTO> getCurrentUser(@RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
-        Utilisateur user = userService.getCurrentUser(token);
-        return ResponseEntity.ok(new UserResponseDTO(user));
+        Utilisateur user = utilisateurService.getCurrentUser(token);
+        return ResponseEntity.ok(new UtilisateursResponseDTO(user));
     }
 
 }

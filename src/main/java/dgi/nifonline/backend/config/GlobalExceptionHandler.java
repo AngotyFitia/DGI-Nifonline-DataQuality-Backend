@@ -20,4 +20,12 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("errors", errors));
     }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<?> handleRuntimeException(RuntimeException ex) {
+        return ResponseEntity
+            .badRequest()
+            .body(Map.of("errors", Map.of("global", new String[]{ex.getMessage()})));
+    }
+
 }
