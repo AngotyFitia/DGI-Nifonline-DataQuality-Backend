@@ -34,4 +34,6 @@ Ce document retrace l'évolution du projet DGI et les principales contributions 
 
 - Lien : https://github.com/AngotyFitia/DGI-Nifonline-DataQuality-Backend/pull/4
 
+## PR #5 - Gestion des erreurs de deploiement
+- Lien : https://github.com/AngotyFitia/DGI-Nifonline-DataQuality-Backend/pull/5
 
