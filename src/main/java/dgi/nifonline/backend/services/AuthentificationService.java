@@ -16,6 +16,8 @@ import dgi.nifonline.backend.models.SessionToken;
 import java.util.Date;
 import dgi.nifonline.backend.repositories.SessionTokenRepository;
 import dgi.nifonline.backend.repositories.ProfilRepository;
+import java.time.LocalDateTime;
+
 
 @Service
 public class AuthentificationService {
@@ -61,20 +63,32 @@ public class AuthentificationService {
         user.setMotDePasse(encodePassword(request.getMotDePasse()));
         user.setEtat(0);
         user.setProfil(profil);
+        user.setDateCreation(LocalDateTime.now());
         utilisateurRepository.save(user);
     
         return new ApiResponseDTO(true, "Compte créé avec succès !");
     }
     
+
     public TokenResponseDTO login(LoginRequestDTO request) {
         if (!reCaptcha.validate(request.getRecaptchaToken())) {
             throw new RuntimeException("Veuillez confirmer que vous n'êtes pas un robot.");
         }
     
         Utilisateur user = utilisateurRepository.findByEmail(request.getEmail()).orElseThrow(() -> new RuntimeException("Email ou mot de passe invalide."));
+        if (user.getTentativesEchouees() >= 5) {
+            throw new RuntimeException("Compte temporairement bloqué après trop de tentatives.");
+        }
+    
         if (!matches(request.getMotDePasse(), user.getMotDePasse())) {
+            user.setTentativesEchouees(user.getTentativesEchouees() + 1);
+            utilisateurRepository.save(user);
             throw new RuntimeException("Email ou mot de passe invalide.");
         }
+    
+        user.setTentativesEchouees(0);
+        utilisateurRepository.save(user);
+    
         String role = user.getProfil().getIntitule();
         String token = jwtUtil.generateToken(user.getEmail(), role);
         SessionToken session = new SessionToken();
@@ -84,6 +98,7 @@ public class AuthentificationService {
         sessionTokenRepository.save(session);
         return new TokenResponseDTO(token);
     }
+    
     
     
     public void logout(String token) {

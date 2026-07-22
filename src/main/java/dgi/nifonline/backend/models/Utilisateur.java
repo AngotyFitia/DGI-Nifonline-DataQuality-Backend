@@ -34,6 +34,9 @@ public class Utilisateur{
     @Column(name = "date_creation", nullable = false)
     private LocalDateTime dateCreation;
 
+    @Column(name = "tentatives_echouees")
+    private int tentativesEchouees = 0;
+
     @ManyToOne
     @JoinColumn(name = "id_profil") 
     private Profil profil;

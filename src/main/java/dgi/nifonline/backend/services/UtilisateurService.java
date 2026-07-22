@@ -1,6 +1,7 @@
 package dgi.nifonline.backend.services;
 import dgi.nifonline.backend.models.Utilisateur;
 import dgi.nifonline.backend.repositories.UtilisateurRepository;
+import dgi.nifonline.backend.repositories.SessionTokenRepository;
 import dgi.nifonline.backend.utils.JWTUtil;
 import dgi.nifonline.backend.dtos.UtilisateurKpiDTO; 
 import org.springframework.stereotype.Service;
@@ -8,14 +9,18 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import java.time.LocalDateTime;
+import java.util.Date;
+import dgi.nifonline.backend.dtos.SecuriteKpiDTO;
 
 @Service
 public class UtilisateurService {
     private final UtilisateurRepository utilisateurRepository;
     private final JWTUtil jwtUtil;
+    private final SessionTokenRepository sessionTokenRepository;
 
-    public UtilisateurService(UtilisateurRepository utilisateurRepository, JWTUtil jwtUtil) {
+    public UtilisateurService(UtilisateurRepository utilisateurRepository, JWTUtil jwtUtil, SessionTokenRepository sessionTokenRepository) {
         this.utilisateurRepository = utilisateurRepository;
+        this.sessionTokenRepository = sessionTokenRepository;
         this.jwtUtil = jwtUtil;
     }
 
@@ -76,6 +81,17 @@ public class UtilisateurService {
         dto.setNouveaux7Jours(utilisateurRepository.countByDateCreationAfter(LocalDateTime.now().minusDays(7)));
         return dto;
     }
+
+    public SecuriteKpiDTO getSecuriteKpi() {
+        SecuriteKpiDTO dto = new SecuriteKpiDTO();
+        dto.setTentativesEchouees(utilisateurRepository.sumTentativesEchouees());
+        dto.setSessionsActives(sessionTokenRepository.countByExpirationAfter(new Date()));
+        return dto;
+    }
+    
+    public List<Utilisateur> getUtilisateursSuspects() {
+        return utilisateurRepository.findByTentativesEchoueesGreaterThan(5);
+    }    
     
 }
 

@@ -7,13 +7,17 @@ import dgi.nifonline.backend.models.Utilisateur;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.repository.Query;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Repository
 public interface UtilisateurRepository extends JpaRepository<Utilisateur, Long> {
     long count();
     long countByEtat(int etat); 
     long countByDateCreationAfter(LocalDateTime date);
+    
+    
     Optional<Utilisateur> findByEmail(String email);
 
     Page<Utilisateur> findByEmailContainingIgnoreCase(String email, Pageable pageable);
@@ -24,6 +28,11 @@ public interface UtilisateurRepository extends JpaRepository<Utilisateur, Long> 
     Page<Utilisateur> findByProfil_Intitule(String profil, Pageable pageable);
     Page<Utilisateur> findByEtat(int etat, Pageable pageable);
     Page<Utilisateur> findByProfil_IntituleAndEtat(String profil, int etat, Pageable pageable);
+
+    @Query("SELECT SUM(u.tentativesEchouees) FROM Utilisateur u")
+    long sumTentativesEchouees();
+
+    List<Utilisateur> findByTentativesEchoueesGreaterThan(int tentatives);
 }
 
 

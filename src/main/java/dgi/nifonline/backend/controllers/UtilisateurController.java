@@ -11,6 +11,8 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
+import dgi.nifonline.backend.dtos.SecuriteKpiDTO;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/utilisateurs")
@@ -43,6 +45,18 @@ public class UtilisateurController {
     @PreAuthorize("hasAuthority('administrateur')")
     public UtilisateurKpiDTO getUtilisateurKpi() {
         return utilisateurService.getUtilisateurKpi();
+    }
+
+    @GetMapping("/kpi-securite")
+    @PreAuthorize("hasAuthority('administrateur')")
+    public SecuriteKpiDTO getSecuriteKpi() {
+        return utilisateurService.getSecuriteKpi();
+    }
+
+    @GetMapping("/alertes-securite")
+    @PreAuthorize("hasAuthority('administrateur')")
+    public List<UtilisateursResponseDTO> getAlertesSecurite() {
+        return utilisateurService.getUtilisateursSuspects().stream().map(UtilisateursResponseDTO::new).collect(Collectors.toList());
     }
 
 }
