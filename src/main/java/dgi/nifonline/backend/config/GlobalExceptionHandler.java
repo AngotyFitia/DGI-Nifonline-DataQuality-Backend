@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-
+import dgi.nifonline.backend.dtos.ExceptionDTO;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,6 +26,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity
             .badRequest()
             .body(Map.of("errors", Map.of("global", new String[]{ex.getMessage()})));
+    }
+
+    @ExceptionHandler(ExceptionDTO.class)
+    public ResponseEntity<Map<String, String>> handleAuthException(ExceptionDTO ex) {
+        Map<String, String> body = new HashMap<>();
+        body.put("message", ex.getMessage());
+        body.put("type", ex.getType());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(body);
     }
 
 }

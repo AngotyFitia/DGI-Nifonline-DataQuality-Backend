@@ -4,13 +4,21 @@ import dgi.nifonline.backend.repositories.UtilisateurRepository;
 import dgi.nifonline.backend.repositories.SessionTokenRepository;
 import dgi.nifonline.backend.utils.JWTUtil;
 import dgi.nifonline.backend.dtos.UtilisateurKpiDTO; 
+import dgi.nifonline.backend.dtos.ProfilKpiDTO; 
+import dgi.nifonline.backend.dtos.InscriptionsParMoisDTO; 
 import org.springframework.stereotype.Service;
 import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Date;
 import dgi.nifonline.backend.dtos.SecuriteKpiDTO;
+import java.util.stream.Collectors;
+import java.util.Map;
+import java.time.format.DateTimeFormatter;
+import org.springframework.format.annotation.DateTimeFormat;
+
 
 @Service
 public class UtilisateurService {
@@ -92,6 +100,31 @@ public class UtilisateurService {
     public List<Utilisateur> getUtilisateursSuspects() {
         return utilisateurRepository.findByTentativesEchoueesGreaterThan(5);
     }    
+
+    public ProfilKpiDTO getRepartitionParProfil() {
+        Map<String, Long> repartition = utilisateurRepository.findAll().stream().collect(Collectors.groupingBy(
+                u -> u.getProfil().getIntitule(),
+                Collectors.counting()
+            ));
+        ProfilKpiDTO dto = new ProfilKpiDTO();
+        dto.setRepartition(repartition);
+        return dto;
+    }
+
+    public List<InscriptionsParMoisDTO> getInscriptionsParMoisRange(LocalDate startDate, LocalDate endDate) {
+        LocalDateTime start = startDate.atStartOfDay();
+        LocalDateTime end = endDate.atTime(23, 59, 59);
+        List<Utilisateur> utilisateurs = utilisateurRepository.findByDateCreationBetween(start, end);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM");
     
+        return utilisateurs.stream()
+            .collect(Collectors.groupingBy(
+                u -> u.getDateCreation().format(formatter),
+                Collectors.counting()
+            ))
+            .entrySet().stream()
+            .map(e -> new InscriptionsParMoisDTO(e.getKey(), e.getValue()))
+            .collect(Collectors.toList());
+    }    
 }
 

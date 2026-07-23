@@ -5,6 +5,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import dgi.nifonline.backend.dtos.RegisterRequestDTO;
 import dgi.nifonline.backend.dtos.LoginRequestDTO;
 import dgi.nifonline.backend.dtos.TokenResponseDTO;
+import dgi.nifonline.backend.dtos.ExceptionDTO;
 import dgi.nifonline.backend.dtos.ApiResponseDTO;
 import dgi.nifonline.backend.models.Utilisateur;
 import dgi.nifonline.backend.models.Profil;
@@ -85,10 +86,15 @@ public class AuthentificationService {
             utilisateurRepository.save(user);
             throw new RuntimeException("Email ou mot de passe invalide.");
         }
+
+        if(user.getEtat() == 0){
+            throw new ExceptionDTO("Votre compte est encore en attente de validation", "warning");
+        } else if(user.getEtat() == 5){
+            throw new ExceptionDTO("Nous avons banni ce compte. Veuillez vous réinscrire.", "error");
+        }        
     
         user.setTentativesEchouees(0);
         utilisateurRepository.save(user);
-    
         String role = user.getProfil().getIntitule();
         String token = jwtUtil.generateToken(user.getEmail(), role);
         SessionToken session = new SessionToken();
@@ -98,8 +104,6 @@ public class AuthentificationService {
         sessionTokenRepository.save(session);
         return new TokenResponseDTO(token);
     }
-    
-    
     
     public void logout(String token) {
         sessionTokenRepository.deleteByToken(token);

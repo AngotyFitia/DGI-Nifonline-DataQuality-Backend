@@ -7,9 +7,10 @@ import dgi.nifonline.backend.models.Utilisateur;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.jpa.repository.Query;
-import java.time.LocalDateTime;
 import java.util.List;
+import java.time.LocalDateTime;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 @Repository
 public interface UtilisateurRepository extends JpaRepository<Utilisateur, Long> {
@@ -33,6 +34,10 @@ public interface UtilisateurRepository extends JpaRepository<Utilisateur, Long> 
     long sumTentativesEchouees();
 
     List<Utilisateur> findByTentativesEchoueesGreaterThan(int tentatives);
+
+    List<Utilisateur> findByDateCreationBetween(LocalDateTime start, LocalDateTime end);
+
+    List<Utilisateur> findTop5ByOrderByTentativesEchoueesDesc();
 }
 
 

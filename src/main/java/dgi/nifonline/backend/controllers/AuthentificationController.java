@@ -17,6 +17,7 @@ import dgi.nifonline.backend.services.ProfilService;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.GetMapping;
 import dgi.nifonline.backend.models.Utilisateur;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -55,11 +56,14 @@ public class AuthentificationController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.replace("Bearer ", "");
-        authService.logout(token);
-        return ResponseEntity.ok("Logged out successfully");
+    public ResponseEntity<?> logout(HttpServletRequest request) {
+        String token = request.getHeader("Authorization");
+        if (token == null || !token.startsWith("Bearer ")) {
+            return ResponseEntity.badRequest().body("Token manquant");
+        }
+        return ResponseEntity.ok().build();
     }
+
 
     @GetMapping("/me")
     public ResponseEntity<UtilisateursResponseDTO> getCurrentUser(@RequestHeader("Authorization") String authHeader) {
