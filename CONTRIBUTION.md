@@ -37,3 +37,8 @@ Ce document retrace l'évolution du projet DGI et les principales contributions 
 ## PR #5 - Gestion des erreurs de deploiement
 - Lien : https://github.com/AngotyFitia/DGI-Nifonline-DataQuality-Backend/pull/5
 
+## PR #6 - Gestion de la securite applicative
+  - Mise en place de système de détection de tentatives suspects
+  - Uniformisation des messages d’erreur backend pour une meilleure intégration frontend.
+  - Mise à jour du GlobalExceptionHandler pour renvoyer { message, type } en cas d’exception personnalisée.
+- Lien : https://github.com/AngotyFitia/DGI-Nifonline-DataQuality-Backend/pull/6
