@@ -5,6 +5,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import dgi.nifonline.backend.dtos.RegisterRequestDTO;
 import dgi.nifonline.backend.dtos.LoginRequestDTO;
 import dgi.nifonline.backend.dtos.TokenResponseDTO;
+import dgi.nifonline.backend.dtos.ExceptionDTO;
 import dgi.nifonline.backend.dtos.ApiResponseDTO;
 import dgi.nifonline.backend.models.Utilisateur;
 import dgi.nifonline.backend.models.Profil;
@@ -16,6 +17,8 @@ import dgi.nifonline.backend.models.SessionToken;
 import java.util.Date;
 import dgi.nifonline.backend.repositories.SessionTokenRepository;
 import dgi.nifonline.backend.repositories.ProfilRepository;
+import java.time.LocalDateTime;
+
 
 @Service
 public class AuthentificationService {
@@ -61,20 +64,37 @@ public class AuthentificationService {
         user.setMotDePasse(encodePassword(request.getMotDePasse()));
         user.setEtat(0);
         user.setProfil(profil);
+        user.setDateCreation(LocalDateTime.now());
         utilisateurRepository.save(user);
     
         return new ApiResponseDTO(true, "Compte créé avec succès !");
     }
     
+
     public TokenResponseDTO login(LoginRequestDTO request) {
         if (!reCaptcha.validate(request.getRecaptchaToken())) {
             throw new RuntimeException("Veuillez confirmer que vous n'êtes pas un robot.");
         }
     
         Utilisateur user = utilisateurRepository.findByEmail(request.getEmail()).orElseThrow(() -> new RuntimeException("Email ou mot de passe invalide."));
+        if (user.getTentativesEchouees() >= 5) {
+            throw new RuntimeException("Compte temporairement bloqué après trop de tentatives.");
+        }
+    
         if (!matches(request.getMotDePasse(), user.getMotDePasse())) {
+            user.setTentativesEchouees(user.getTentativesEchouees() + 1);
+            utilisateurRepository.save(user);
             throw new RuntimeException("Email ou mot de passe invalide.");
         }
+
+        if(user.getEtat() == 0){
+            throw new ExceptionDTO("Votre compte est encore en attente de validation", "warning");
+        } else if(user.getEtat() == 5){
+            throw new ExceptionDTO("Nous avons banni ce compte. Veuillez vous réinscrire.", "error");
+        }        
+    
+        user.setTentativesEchouees(0);
+        utilisateurRepository.save(user);
         String role = user.getProfil().getIntitule();
         String token = jwtUtil.generateToken(user.getEmail(), role);
         SessionToken session = new SessionToken();
@@ -84,7 +104,6 @@ public class AuthentificationService {
         sessionTokenRepository.save(session);
         return new TokenResponseDTO(token);
     }
-    
     
     public void logout(String token) {
         sessionTokenRepository.deleteByToken(token);

@@ -11,6 +11,12 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
+import dgi.nifonline.backend.dtos.SecuriteKpiDTO;
+import dgi.nifonline.backend.dtos.ProfilKpiDTO;
+import dgi.nifonline.backend.dtos.InscriptionsParMoisDTO;
+import java.util.stream.Collectors;
+import java.time.LocalDate;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @RestController
 @RequestMapping("/api/utilisateurs")
@@ -45,4 +51,28 @@ public class UtilisateurController {
         return utilisateurService.getUtilisateurKpi();
     }
 
+    @GetMapping("/kpi-securite")
+    @PreAuthorize("hasAuthority('administrateur')")
+    public SecuriteKpiDTO getSecuriteKpi() {
+        return utilisateurService.getSecuriteKpi();
+    }
+
+    @GetMapping("/alertes-securite")
+    @PreAuthorize("hasAuthority('administrateur')")
+    public List<UtilisateursResponseDTO> getAlertesSecurite() {
+        return utilisateurService.getUtilisateursSuspects().stream().map(UtilisateursResponseDTO::new).collect(Collectors.toList());
+    }
+
+    @GetMapping("/kpi-profil")
+    @PreAuthorize("hasAuthority('administrateur')")
+    public ProfilKpiDTO getRepartitionParProfil() {
+        return utilisateurService.getRepartitionParProfil();
+    }
+
+    @GetMapping("/kpi-inscriptions-range")
+    @PreAuthorize("hasAuthority('administrateur')")
+    public List<InscriptionsParMoisDTO> getInscriptionsParMoisRange(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate, @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        return utilisateurService.getInscriptionsParMoisRange(startDate, endDate);
+    }
+    
 }
