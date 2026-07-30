@@ -19,30 +19,43 @@ public class ProvinceService {
     }
 
     public ImportReportDTO importer(String chemin) throws Exception {
-        List<ProvinceDTO> dtos = CSVUtil.lireCSV(chemin);
+        List<String[]> lignes = CSVUtil.lireCSV(chemin, 2);
+
         int succes = 0;
         int echec = 0;
         StringBuilder message = new StringBuilder();
 
-        for (ProvinceDTO dto : dtos) {
-            if (provinceRepository.findByIntitule(dto.getIntitule()).isPresent()) {
-                echec++;
-                message.append("Échec: Province '") .append(dto.getIntitule()).append("' existe déjà.\n");
-            } else {
-                Province province = new Province();
-                province.setIntitule(dto.getIntitule());
-                if ("Validé".equals(dto.getEtat())) {
-                    province.setEtat(1);
-                } else if ("En attente".equals(dto.getEtat())) {
-                    province.setEtat(0);
+        int lineNumber = 1;
+        for (String[] valeurs : lignes) {
+            ProvinceDTO dto = new ProvinceDTO(valeurs[0].trim(), valeurs[1].trim());
+            try {
+                dto.validate(lineNumber);
+
+                if (provinceRepository.findByIntitule(dto.getIntitule()).isPresent()) {
+                    echec++;
+                    message.append("Échec: Ligne ").append(lineNumber).append(" → Province '").append(dto.getIntitule()).append("' existe déjà.\n");
                 } else {
-                    province.setEtat(-1);
+                    Province province = new Province();
+                    province.setIntitule(dto.getIntitule());
+
+                    if ("Validé".equals(dto.getEtat())) {
+                        province.setEtat(1);
+                    } else if ("En attente".equals(dto.getEtat())) {
+                        province.setEtat(0);
+                    } else {
+                        province.setEtat(-1);
+                    }
+
+                    provinceRepository.save(province);
+                    succes++;
+                    message.append("Succès: Ligne ").append(lineNumber).append(" → Province '").append(dto.getIntitule()).append("' insérée avec succès.\n");
                 }
-                provinceRepository.save(province);
-                succes++;
-                message.append("Succès: Province '").append(dto.getIntitule()).append("' insérée avec succès.\n");
+            } catch (Exception ex) {
+                echec++;
+                message.append("Échec: Ligne ").append(lineNumber).append(" → ").append(ex.getMessage()).append("\n");
             }
+            lineNumber++;
         }
-        return new ImportReportDTO(dtos.size(), succes, echec, message.toString());
+        return new ImportReportDTO(lignes.size(), succes, echec, message.toString());
     }
 }

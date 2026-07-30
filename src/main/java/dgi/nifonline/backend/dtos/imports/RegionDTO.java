@@ -7,9 +7,9 @@ import lombok.Setter;
 @Getter @Setter
 @AllArgsConstructor
 public class RegionDTO {
+    private String provinceIntitule;
     private String intitule;
     private String etat;
-    private String provinceIntitule;
 
     public void validate(int lineNumber) throws Exception {
         if (intitule == null || intitule.trim().isEmpty()) {
