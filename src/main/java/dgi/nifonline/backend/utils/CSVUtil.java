@@ -17,7 +17,7 @@ public class CSVUtil {
             br.readLine();
             while ((ligne = br.readLine()) != null) {
                 numeroLigne++;
-                String[] valeurs = ligne.split(";");
+                String[] valeurs = ligne.split(",");
                 if (valeurs.length < 2) {
                     throw new Exception("Erreur à la ligne " + numeroLigne + " : nombre de colonnes invalide");
                 }

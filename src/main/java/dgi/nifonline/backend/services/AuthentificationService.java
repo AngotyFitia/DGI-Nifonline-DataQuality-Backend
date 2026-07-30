@@ -72,9 +72,9 @@ public class AuthentificationService {
     
 
     public TokenResponseDTO login(LoginRequestDTO request) {
-        if (!reCaptcha.validate(request.getRecaptchaToken())) {
-            throw new RuntimeException("Veuillez confirmer que vous n'êtes pas un robot.");
-        }
+        // if (!reCaptcha.validate(request.getRecaptchaToken())) {
+        //     throw new RuntimeException("Veuillez confirmer que vous n'êtes pas un robot.");
+        // }
     
         Utilisateur user = utilisateurRepository.findByEmail(request.getEmail()).orElseThrow(() -> new RuntimeException("Email ou mot de passe invalide."));
         if (user.getTentativesEchouees() >= 5) {
