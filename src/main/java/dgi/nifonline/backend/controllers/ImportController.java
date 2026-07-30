@@ -4,6 +4,7 @@ import dgi.nifonline.backend.dtos.imports.ImportReportDTO;
 import dgi.nifonline.backend.services.imports.ProvinceService;
 import dgi.nifonline.backend.services.imports.RegionService;
 import dgi.nifonline.backend.services.imports.DistrictService;
+import dgi.nifonline.backend.services.imports.CommuneService;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,11 +21,13 @@ public class ImportController {
     private final ProvinceService provinceService;
     private final RegionService regionService;
     private final DistrictService districtService;
+    private final CommuneService communeService;
 
-    public ImportController(ProvinceService provinceService, RegionService regionService, DistrictService districtService) {
+    public ImportController(ProvinceService provinceService, RegionService regionService, DistrictService districtService, CommuneService communeService) {
         this.provinceService = provinceService;
         this.regionService= regionService;
         this.districtService=  districtService;
+        this.communeService=  communeService;
     }
 
     @PostMapping("/provinces")
@@ -63,6 +66,20 @@ public class ImportController {
             file.transferTo(tempFile);
 
             return districtService.importer(tempFile.getAbsolutePath());
+
+        } catch (Exception e) {
+            return new ImportReportDTO(0, 0, 0, "Erreur lors de l'import : " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/communes")
+    @PreAuthorize("hasAuthority('administrateur')")
+    public ImportReportDTO importCommune(@RequestParam("file") MultipartFile file) {
+        try {
+            File tempFile = File.createTempFile("district", ".csv");
+            file.transferTo(tempFile);
+
+            return communeService.importer(tempFile.getAbsolutePath());
 
         } catch (Exception e) {
             return new ImportReportDTO(0, 0, 0, "Erreur lors de l'import : " + e.getMessage());
