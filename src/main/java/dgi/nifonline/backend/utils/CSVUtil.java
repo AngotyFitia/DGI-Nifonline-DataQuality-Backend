@@ -5,12 +5,10 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import dgi.nifonline.backend.dtos.imports.ProvinceDTO;
-
 public class CSVUtil {
 
-    public static List<ProvinceDTO> lireCSV(String chemin) throws Exception {
-        List<ProvinceDTO> provinces = new ArrayList<>();
+    public static List<String[]> lireCSV(String chemin, int expectedColumns) throws Exception {
+        List<String[]> lignes = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(chemin))) {
             String ligne;
             int numeroLigne = 0;
@@ -18,14 +16,13 @@ public class CSVUtil {
             while ((ligne = br.readLine()) != null) {
                 numeroLigne++;
                 String[] valeurs = ligne.split(",");
-                if (valeurs.length < 2) {
-                    throw new Exception("Erreur à la ligne " + numeroLigne + " : nombre de colonnes invalide");
+                if (valeurs.length != expectedColumns) {
+                    throw new Exception("Erreur à la ligne " + numeroLigne +
+                        " : nombre de colonnes invalide (attendu " + expectedColumns + ")");
                 }
-                ProvinceDTO dto = new ProvinceDTO(valeurs[0].trim(), valeurs[1].trim());
-                dto.validate(numeroLigne);
-                provinces.add(dto);
+                lignes.add(valeurs);
             }
         }
-        return provinces;
+        return lignes;
     }
 }
