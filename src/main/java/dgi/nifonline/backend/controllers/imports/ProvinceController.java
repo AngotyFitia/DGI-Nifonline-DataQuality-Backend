@@ -1,6 +1,6 @@
 package dgi.nifonline.backend.controllers;
 
-import dgi.nifonline.backend.services.ProvinceService;
+import dgi.nifonline.backend.services.imports.ProvinceService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,7 +12,7 @@ public class ProvinceController {
 
     private final ProvinceService provinceImportService;
 
-    public ProvinceImportController(ProvinceService provinceImportService) {
+    public ProvinceController(ProvinceService provinceImportService) {
         this.provinceImportService = provinceImportService;
     }
 

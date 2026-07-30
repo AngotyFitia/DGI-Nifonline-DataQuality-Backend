@@ -1,4 +1,4 @@
-package dgi.nifonline.backend.imports.dtos;
+package dgi.nifonline.backend.dtos.imports;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

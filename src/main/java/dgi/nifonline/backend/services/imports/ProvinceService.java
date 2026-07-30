@@ -1,9 +1,9 @@
-package dgi.nifonline.backend.imports.services;
+package dgi.nifonline.backend.services.imports;
 
-import dgi.nifonline.backend.dtos.ImportProvinceDTO;
+import dgi.nifonline.backend.dtos.imports.ProvinceDTO;
 import dgi.nifonline.backend.models.Province;
 import dgi.nifonline.backend.repositories.ProvinceRepository;
-import dgi.nifonline.backend.utils.CSVUtils;
+import dgi.nifonline.backend.utils.CSVUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,11 +18,11 @@ public class ProvinceService {
     }
 
     public void importer(String chemin) throws Exception {
-        List<ImportProvinceDTO> dtos = CSVUtils.lireCSV(chemin);
-        for (ImportProvinceDTO dto : dtos) {
+        List<ProvinceDTO> dtos = CSVUtil.lireCSV(chemin);
+        for (ProvinceDTO dto : dtos) {
             Province province = new Province();
             province.setIntitule(dto.getIntitule());
-            province.setEtat(1); // valeur par défaut
+            province.setEtat(1); 
             provinceRepository.save(province);
         }
     }
