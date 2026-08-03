@@ -37,7 +37,7 @@ public class CommuneService {
                 if (district == null) {
                     echec++;
                     message.append("Échec: Ligne ").append(lineNumber).append(" → District '").append(dto.getDistrictIntitule()).append("' inexistante.\n");
-                } else if (communeRepository.findByIntitule(dto.getIntitule()).isPresent()) {
+                } else if (communeRepository.findByIntituleAndDistrict(dto.getIntitule(), district).isPresent()) {
                     echec++;
                     message.append("Échec: Ligne ").append(lineNumber).append(" → Commune '").append(dto.getIntitule()).append("' existe déjà.\n");
                 } else {
@@ -54,7 +54,8 @@ public class CommuneService {
 
                     communeRepository.save(commune);
                     succes++;
-                    message.append("Succès: Ligne ").append(lineNumber).append(" → Commune '").append(dto.getIntitule()).append("' insérée avec succès.\n");
+                    message.append("Succès: Ligne ").append(lineNumber).append(" → Commune '").append(dto.getIntitule()).append("' insérée avec succès dans le district '")
+                    .append(district.getIntitule()).append("'.\n");
                 }
             } catch (Exception ex) {
                 echec++;
@@ -64,4 +65,5 @@ public class CommuneService {
         }
         return new ImportReportDTO(lignes.size(), succes, echec, message.toString());
     }
+
 }
