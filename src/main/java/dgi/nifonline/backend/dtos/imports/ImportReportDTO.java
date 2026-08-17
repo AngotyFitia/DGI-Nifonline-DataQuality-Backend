@@ -8,7 +8,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ImportReportDTO {
     private int total;
-    private int succes;
-    private int echec;
+    private int success;
+    private int error;
     private String message;
 }

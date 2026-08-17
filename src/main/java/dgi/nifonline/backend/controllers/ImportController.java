@@ -5,6 +5,8 @@ import dgi.nifonline.backend.services.imports.ProvinceService;
 import dgi.nifonline.backend.services.imports.RegionService;
 import dgi.nifonline.backend.services.imports.DistrictService;
 import dgi.nifonline.backend.services.imports.CommuneService;
+import dgi.nifonline.backend.services.imports.SecteurService;
+import dgi.nifonline.backend.services.imports.ActiviteService;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,12 +24,16 @@ public class ImportController {
     private final RegionService regionService;
     private final DistrictService districtService;
     private final CommuneService communeService;
+    private final SecteurService secteurService;
+    private final ActiviteService activiteService;
 
-    public ImportController(ProvinceService provinceService, RegionService regionService, DistrictService districtService, CommuneService communeService) {
+    public ImportController(ProvinceService provinceService, RegionService regionService, DistrictService districtService, CommuneService communeService, SecteurService secteurService, ActiviteService activiteService) {
         this.provinceService = provinceService;
         this.regionService= regionService;
         this.districtService=  districtService;
         this.communeService=  communeService;
+        this.secteurService= secteurService;
+        this.activiteService= activiteService;
     }
 
     @PostMapping("/provinces")
@@ -80,6 +86,34 @@ public class ImportController {
             file.transferTo(tempFile);
 
             return communeService.importer(tempFile.getAbsolutePath());
+
+        } catch (Exception e) {
+            return new ImportReportDTO(0, 0, 0, "Erreur lors de l'import : " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/secteurs")
+    @PreAuthorize("hasAuthority('administrateur')")
+    public ImportReportDTO importSecteur(@RequestParam("file") MultipartFile file) {
+        try {
+            File tempFile = File.createTempFile("secteur", ".csv");
+            file.transferTo(tempFile);
+
+            return secteurService.importer(tempFile.getAbsolutePath());
+
+        } catch (Exception e) {
+            return new ImportReportDTO(0, 0, 0, "Erreur lors de l'import : " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/activites")
+    @PreAuthorize("hasAuthority('administrateur')")
+    public ImportReportDTO importActivite(@RequestParam("file") MultipartFile file) {
+        try {
+            File tempFile = File.createTempFile("activite", ".csv");
+            file.transferTo(tempFile);
+
+            return activiteService.importer(tempFile.getAbsolutePath());
 
         } catch (Exception e) {
             return new ImportReportDTO(0, 0, 0, "Erreur lors de l'import : " + e.getMessage());
