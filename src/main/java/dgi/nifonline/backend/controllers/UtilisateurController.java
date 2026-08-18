@@ -2,7 +2,12 @@ package dgi.nifonline.backend.controllers;
 
 import dgi.nifonline.backend.models.Utilisateur;
 import dgi.nifonline.backend.repositories.UtilisateurRepository;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping; 
+import org.springframework.web.bind.annotation.GetMapping; 
+import org.springframework.web.bind.annotation.RequestParam; 
+import org.springframework.web.bind.annotation.PathVariable; 
+import org.springframework.web.bind.annotation.PutMapping; 
 import org.springframework.security.access.prepost.PreAuthorize;
 import dgi.nifonline.backend.services.UtilisateurService;
 import dgi.nifonline.backend.dtos.UtilisateursResponseDTO;

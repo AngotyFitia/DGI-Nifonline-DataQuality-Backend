@@ -1,6 +1,7 @@
 package dgi.nifonline.backend.services.imports;
 
 import dgi.nifonline.backend.dtos.imports.CommuneDTO;
+import dgi.nifonline.backend.dtos.CommuneListeDTO;
 import dgi.nifonline.backend.dtos.imports.ImportReportDTO;
 import dgi.nifonline.backend.models.Commune;
 import dgi.nifonline.backend.models.District;
@@ -66,4 +67,7 @@ public class CommuneService {
         return new ImportReportDTO(lignes.size(), succes, echec, message.toString());
     }
 
+    public List<CommuneListeDTO> getCommunesAvecHierarchie() {
+        return communeRepository.findAll().stream().map(CommuneListeDTO::new).toList();
+    }
 }

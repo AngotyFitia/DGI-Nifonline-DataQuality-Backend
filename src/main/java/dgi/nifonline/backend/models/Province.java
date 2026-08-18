@@ -6,9 +6,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Table;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.OneToMany;
 import lombok.Getter;
 import lombok.Setter;
+import java.util.List;
 
 
 @Entity
@@ -27,4 +28,6 @@ public class Province {
     @Column(name= "etat")
     private int etat;
 
+    @OneToMany(mappedBy ="province") // Cela veut dire que cette relation est déjà mappée par l'attribut province dans l'entité Region 
+    private List<Region> regions;
 }
