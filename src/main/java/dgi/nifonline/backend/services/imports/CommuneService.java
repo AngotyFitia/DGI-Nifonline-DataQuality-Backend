@@ -9,7 +9,8 @@ import dgi.nifonline.backend.repositories.CommuneRepository;
 import dgi.nifonline.backend.repositories.DistrictRepository;
 import dgi.nifonline.backend.utils.CSVUtil;
 import org.springframework.stereotype.Service;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 @Service
@@ -67,7 +68,22 @@ public class CommuneService {
         return new ImportReportDTO(lignes.size(), succes, echec, message.toString());
     }
 
-    public List<CommuneListeDTO> getCommunesAvecHierarchie() {
-        return communeRepository.findAll().stream().map(CommuneListeDTO::new).toList();
+    public Page<CommuneListeDTO> getCommunesAvecFiltres(String province, String region, String district, Pageable pageable) {
+        boolean hasProvince = !province.equals("tous");
+        boolean hasRegion = !region.equals("tous");
+        boolean hasDistrict = !district.equals("tous");
+
+        Page<Commune> communes;
+        if (hasProvince && hasRegion && hasDistrict) {
+            communes = communeRepository.findByDistrict_Region_Province_IntituleAndDistrict_Region_IntituleAndDistrict_Intitule(province, region, district, pageable);
+        } else if (hasProvince && hasRegion) {
+            communes = communeRepository.findByDistrict_Region_Province_IntituleAndDistrict_Region_Intitule(province, region, pageable);
+        } else if (hasProvince) {
+            communes = communeRepository.findByDistrict_Region_Province_Intitule(province, pageable);
+        } else {
+            communes = communeRepository.findAll(pageable);
+        }
+
+        return communes.map(CommuneListeDTO::new);
     }
 }

@@ -58,4 +58,8 @@ public class ProvinceService {
         }
         return new ImportReportDTO(lignes.size(), succes, echec, message.toString());
     }
+
+    public List<ProvinceDTO> getProvinces() {
+        return provinceRepository.findAll().stream().map(p -> new ProvinceDTO(p.getIntitule(), String.valueOf(p.getEtat()))).toList();
+    }
 }
