@@ -2,6 +2,7 @@ package dgi.nifonline.backend.controllers;
 
 import dgi.nifonline.backend.dtos.imports.ImportReportDTO;
 import dgi.nifonline.backend.dtos.imports.RegimeFiscalDTO;
+import dgi.nifonline.backend.dtos.imports.FormeJuridiqueDTO;
 import dgi.nifonline.backend.services.imports.ProvinceService;
 import dgi.nifonline.backend.services.imports.RegionService;
 import dgi.nifonline.backend.services.imports.DistrictService;
@@ -9,6 +10,7 @@ import dgi.nifonline.backend.services.imports.CommuneService;
 import dgi.nifonline.backend.services.imports.SecteurService;
 import dgi.nifonline.backend.services.imports.ActiviteService;
 import dgi.nifonline.backend.services.imports.RegimeFiscalService;
+import dgi.nifonline.backend.services.imports.FormeJuridiqueService;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,8 +35,9 @@ public class ImportController {
     private final SecteurService secteurService;
     private final ActiviteService activiteService;
     private final RegimeFiscalService regimeFiscalService;
+    private final FormeJuridiqueService formeJuridiqueService;
 
-    public ImportController(ProvinceService provinceService, RegionService regionService, DistrictService districtService, CommuneService communeService, SecteurService secteurService, ActiviteService activiteService, RegimeFiscalService regimeFiscalService) {
+    public ImportController(ProvinceService provinceService, RegionService regionService, DistrictService districtService, CommuneService communeService, SecteurService secteurService, ActiviteService activiteService, RegimeFiscalService regimeFiscalService, FormeJuridiqueService formeJuridiqueService) {
         this.provinceService = provinceService;
         this.regionService= regionService;
         this.districtService=  districtService;
@@ -42,6 +45,7 @@ public class ImportController {
         this.secteurService= secteurService;
         this.activiteService= activiteService;
         this.regimeFiscalService= regimeFiscalService;
+        this.formeJuridiqueService= formeJuridiqueService;
     }
 
     @PostMapping("/provinces")
@@ -147,5 +151,26 @@ public class ImportController {
     public Page<RegimeFiscalDTO> getRegimesFiscaux(@RequestParam(defaultValue = "tous") String intitule, @RequestParam(defaultValue = "tous") String description, @RequestParam(defaultValue = "tous") String etat, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
         return regimeFiscalService.getRegimesFiscaux(intitule, description, etat, pageable);
+    }
+
+    @PostMapping("/formes-juridiques")
+    @PreAuthorize("hasAuthority('administrateur')")
+    public ImportReportDTO importFormesJuridique(@RequestParam("file") MultipartFile file) {
+        try {
+            File tempFile = File.createTempFile("forme-juridique", ".csv");
+            file.transferTo(tempFile);
+
+            return formeJuridiqueService.importer(tempFile.getAbsolutePath());
+
+        } catch (Exception e) {
+            return new ImportReportDTO(0, 0, 0, "Erreur lors de l'import : " + e.getMessage());
+        }
+    }
+
+    @GetMapping("liste/formes-juridiques")
+    @PreAuthorize("hasAuthority('administrateur')")
+    public Page<FormeJuridiqueDTO> getFormesJuridique(@RequestParam(defaultValue = "tous") String abreviation,  @RequestParam(defaultValue = "tous") String intitule, @RequestParam(defaultValue = "tous") String description, @RequestParam(defaultValue = "tous") String etat, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return formeJuridiqueService.getFormesJuridique(abreviation, intitule, description, etat, pageable);
     }
 }
