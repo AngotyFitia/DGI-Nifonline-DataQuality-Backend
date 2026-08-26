@@ -10,24 +10,21 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name="forme_juridique")
+@Table(name="type_impot")
 @Getter @Setter
-public class FormeJuridique {
+public class TypeImpot {
 
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    @Column(name="id_forme_juridique")
-    private Long idFormeJuridique;
+    @Column(name="id_type_impot")
+    private Long idTypeImpot;
 
-    @Column (name="abreviation", nullable = false, length=100)
-    private String abreviation;
+    @Column (name="code", nullable = false, length=20)
+    private String code;
 
     @Column(name="intitule", nullable=false, length=255)
     private String intitule;
     
-    @Column(name="description", nullable=false, length=255)
-    private String description;
-
     @Column(name="etat", nullable=false)
     private int etat;
 }
