@@ -6,7 +6,8 @@ import dgi.nifonline.backend.models.RegimeFiscal;
 import dgi.nifonline.backend.repositories.RegimeFiscalRepository;
 import dgi.nifonline.backend.utils.CSVUtil;
 import org.springframework.stereotype.Service;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 @Service
@@ -37,9 +38,9 @@ public class RegimeFiscalService {
                     RegimeFiscal regimeFiscal = new RegimeFiscal();
                     regimeFiscal.setIntitule(dto.getIntitule());
                     regimeFiscal.setDescription(dto.getDescription());
-                    if ("Validé".equals(dto.getEtat())) {
+                    if ("Validé".equals(dto.getEtatImport())) {
                         regimeFiscal.setEtat(1);
-                    } else if ("En attente".equals(dto.getEtat())) {
+                    } else if ("En attente".equals(dto.getEtatImport())) {
                         regimeFiscal.setEtat(0);
                     } else {
                         regimeFiscal.setEtat(-1);
@@ -57,4 +58,23 @@ public class RegimeFiscalService {
         }
         return new ImportReportDTO(lignes.size(), succes, echec, message.toString());
     }
+
+    public Page<RegimeFiscalDTO> getRegimesFiscaux(String intitule, String description, String etat, Pageable pageable) {
+        boolean hasIntitule = !intitule.equals("tous");
+        boolean hasDescription = !description.equals("tous");
+        boolean hasEtat = !etat.equals("tous");
+    
+        Page<RegimeFiscal> regimes;
+        if (hasIntitule && hasDescription && hasEtat) {
+            regimes = regimeFiscalRepository.findByIntituleContainingIgnoreCaseAndDescriptionContainingIgnoreCaseAndEtat(intitule, description, Integer.parseInt(etat), pageable);
+        } else if (hasIntitule && hasDescription) {
+            regimes = regimeFiscalRepository.findByIntituleContainingIgnoreCaseAndDescriptionContainingIgnoreCase(intitule, description, pageable);
+        } else if (hasIntitule) {
+            regimes = regimeFiscalRepository.findByIntituleContainingIgnoreCase(intitule, pageable);
+        } else {
+            regimes = regimeFiscalRepository.findAll(pageable);
+        }
+        return regimes.map(RegimeFiscalDTO::new);
+    }
+    
 }
