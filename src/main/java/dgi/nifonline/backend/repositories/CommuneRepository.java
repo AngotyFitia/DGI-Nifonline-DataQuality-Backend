@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 @Repository
 public interface CommuneRepository extends JpaRepository<Commune, Long> {
     Optional<Commune> findByIntituleAndDistrict(String intitule, District district);
+    Optional<Commune> findByIntitule(String intitule);
     Page<Commune> findAll(Pageable pageable);
     Page<Commune> findByDistrict_Region_Province_Intitule(String province, Pageable pageable);
     Page<Commune> findByDistrict_Region_Intitule(String region, Pageable pageable);

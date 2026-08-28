@@ -10,6 +10,7 @@ import dgi.nifonline.backend.services.imports.DistrictService;
 import dgi.nifonline.backend.services.imports.CommuneService;
 import dgi.nifonline.backend.services.imports.SecteurService;
 import dgi.nifonline.backend.services.imports.ActiviteService;
+import dgi.nifonline.backend.services.imports.CoordonneesService;
 import dgi.nifonline.backend.services.imports.RegimeFiscalService;
 import dgi.nifonline.backend.services.imports.FormeJuridiqueService;
 import dgi.nifonline.backend.services.imports.TypeImpotService;
@@ -39,12 +40,13 @@ public class ImportController {
     private final RegimeFiscalService regimeFiscalService;
     private final FormeJuridiqueService formeJuridiqueService;
     private final TypeImpotService typeImpotService;
+    private final CoordonneesService coordonneesService;
 
     public ImportController(ProvinceService provinceService, RegionService regionService, 
                             DistrictService districtService, CommuneService communeService, 
                             SecteurService secteurService, ActiviteService activiteService, 
                             RegimeFiscalService regimeFiscalService, 
-                            FormeJuridiqueService formeJuridiqueService, TypeImpotService typeImpotService) {
+                            FormeJuridiqueService formeJuridiqueService, TypeImpotService typeImpotService, CoordonneesService coordonneesService) {
         this.provinceService = provinceService;
         this.regionService= regionService;
         this.districtService=  districtService;
@@ -54,6 +56,7 @@ public class ImportController {
         this.regimeFiscalService= regimeFiscalService;
         this.formeJuridiqueService= formeJuridiqueService;
         this.typeImpotService= typeImpotService;
+        this.coordonneesService= coordonneesService;
     }
 
     @PostMapping("/provinces")
@@ -202,4 +205,19 @@ public class ImportController {
         Pageable pageable = PageRequest.of(page, size);
         return typeImpotService.getTypesImpots(code, intitule, etat, pageable);
     }
+
+    @PostMapping("/coordonnees")
+    @PreAuthorize("hasAuthority('administrateur')")
+    public ImportReportDTO importCoordonnees(@RequestParam("file") MultipartFile file) {
+        try {
+            File tempFile = File.createTempFile("coordonnee", ".csv");
+            file.transferTo(tempFile);
+
+            return coordonneesService.importer(tempFile.getAbsolutePath());
+
+        } catch (Exception e) {
+            return new ImportReportDTO(0, 0, 0, "Erreur lors de l'import : " + e.getMessage());
+        }
+    }
+
 }
