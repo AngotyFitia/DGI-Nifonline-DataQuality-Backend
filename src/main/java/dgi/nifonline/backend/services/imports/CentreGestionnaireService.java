@@ -32,7 +32,7 @@ public class CentreGestionnaireService {
         for (String[] valeurs : lignes) {
             CentreGestionnaireDTO dto = new CentreGestionnaireDTO(valeurs[0].trim(), valeurs[1].trim(), valeurs[2].trim(), valeurs[3].trim(), valeurs[4].trim(), valeurs[5].trim());
             try {
-                Coordonnees coordonnees = coordonneesRepository.findByEmail(dto.getCoordonnees(), dto.getCommune()).orElse(null);
+                Coordonnees coordonnees = coordonneesRepository.findByEmail(dto.getCoordonnees()).orElse(null);
                 if (centreGestionnaireRepository.findByCodeBureau(dto.getCodeBureau()).isPresent()) {
                     echec++;
                     message.append("Échec: Ligne ").append(lineNumber).append(" → Centre Gestionnaire '").append(dto.getCodeBureau()).append("' existe déjà.\n");
