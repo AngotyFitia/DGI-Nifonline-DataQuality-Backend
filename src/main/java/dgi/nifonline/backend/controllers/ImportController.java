@@ -14,6 +14,7 @@ import dgi.nifonline.backend.services.imports.CoordonneesService;
 import dgi.nifonline.backend.services.imports.RegimeFiscalService;
 import dgi.nifonline.backend.services.imports.FormeJuridiqueService;
 import dgi.nifonline.backend.services.imports.TypeImpotService;
+import dgi.nifonline.backend.services.imports.CentreGestionnaireService;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -41,12 +42,15 @@ public class ImportController {
     private final FormeJuridiqueService formeJuridiqueService;
     private final TypeImpotService typeImpotService;
     private final CoordonneesService coordonneesService;
+    private final CentreGestionnaireService centreGestionnaireService;
 
     public ImportController(ProvinceService provinceService, RegionService regionService, 
                             DistrictService districtService, CommuneService communeService, 
                             SecteurService secteurService, ActiviteService activiteService, 
                             RegimeFiscalService regimeFiscalService, 
-                            FormeJuridiqueService formeJuridiqueService, TypeImpotService typeImpotService, CoordonneesService coordonneesService) {
+                            FormeJuridiqueService formeJuridiqueService, 
+                            TypeImpotService typeImpotService, CoordonneesService coordonneesService,
+                            CentreGestionnaireService centreGestionnaireService) {
         this.provinceService = provinceService;
         this.regionService= regionService;
         this.districtService=  districtService;
@@ -57,6 +61,7 @@ public class ImportController {
         this.formeJuridiqueService= formeJuridiqueService;
         this.typeImpotService= typeImpotService;
         this.coordonneesService= coordonneesService;
+        this.centreGestionnaireService=centreGestionnaireService;
     }
 
     @PostMapping("/provinces")
@@ -214,6 +219,20 @@ public class ImportController {
             file.transferTo(tempFile);
 
             return coordonneesService.importer(tempFile.getAbsolutePath());
+
+        } catch (Exception e) {
+            return new ImportReportDTO(0, 0, 0, "Erreur lors de l'import : " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/centres-gestionnaires")
+    @PreAuthorize("hasAuthority('administrateur')")
+    public ImportReportDTO importCentresGestionnaire(@RequestParam("file") MultipartFile file) {
+        try {
+            File tempFile = File.createTempFile("centre-gestionnaire", ".csv");
+            file.transferTo(tempFile);
+
+            return centreGestionnaireService.importer(tempFile.getAbsolutePath());
 
         } catch (Exception e) {
             return new ImportReportDTO(0, 0, 0, "Erreur lors de l'import : " + e.getMessage());

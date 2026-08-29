@@ -10,4 +10,5 @@ import org.springframework.data.domain.Pageable;
 @Repository
 public interface CoordonneesRepository extends JpaRepository<Coordonnees, Long> {
     Optional<Coordonnees> findByEmail(String email);
+    Optional<Coordonnees> findByEmailAndCommune(String email);
 }
