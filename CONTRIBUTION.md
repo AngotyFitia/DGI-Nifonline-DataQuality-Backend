@@ -42,3 +42,8 @@ Ce document retrace l'évolution du projet DGI et les principales contributions 
   - Uniformisation des messages d’erreur backend pour une meilleure intégration frontend.
   - Mise à jour du GlobalExceptionHandler pour renvoyer { message, type } en cas d’exception personnalisée.
 - Lien : https://github.com/AngotyFitia/DGI-Nifonline-DataQuality-Backend/pull/6
+
+## PR #7 - Gestion des données de référence
+  - Implémentation de l'import des données de base de l'administrateur
+  - Adaptation des données etl
+- Lien : https://github.com/AngotyFitia/DGI-Nifonline-DataQuality-Backend/pull/7

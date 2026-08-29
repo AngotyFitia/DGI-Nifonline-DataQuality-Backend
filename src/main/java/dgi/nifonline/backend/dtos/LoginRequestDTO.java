@@ -14,7 +14,7 @@ public class LoginRequestDTO {
     @NotBlank(message = "Le mot de passe est obligatoire.")
     private String motDePasse;
 
-    @NotEmpty(message = "Veuillez confirmer que vous n'êtes pas un robot.")
+    // @NotEmpty(message = "Veuillez confirmer que vous n'êtes pas un robot.")
     private String recaptchaToken;
 
 }
