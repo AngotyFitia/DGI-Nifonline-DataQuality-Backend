@@ -2,8 +2,12 @@ package dgi.nifonline.backend.config;
 
 import dgi.nifonline.backend.models.Utilisateur;
 import dgi.nifonline.backend.models.Profil;
+import dgi.nifonline.backend.models.Sexe;
+import dgi.nifonline.backend.models.StatutMatrimonial;
 import dgi.nifonline.backend.repositories.UtilisateurRepository;
 import dgi.nifonline.backend.repositories.ProfilRepository;
+import dgi.nifonline.backend.repositories.SexeRepository;
+import dgi.nifonline.backend.repositories.StatutMatrimonialRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,25 +31,57 @@ public class DataInitializer {
     @Bean
     CommandLineRunner initData(UtilisateurRepository utilisateurRepository,
                                ProfilRepository profilRepository,
+                               SexeRepository sexeRepository,
+                               StatutMatrimonialRepository statutMatrimonialRepository,
                                PasswordEncoder passwordEncoder) {
         return args -> {
-            Profil adminProfil = profilRepository.findByIntitule("administrateur")
-                    .orElseGet(() -> {
-                        Profil p = new Profil();
-                        p.setIntitule("administrateur");
-                        return profilRepository.save(p);
-                    });
+            Profil adminProfil = profilRepository.findByIntitule("administrateur").orElseGet(() -> {
+                Profil administrateur = new Profil();
+                administrateur.setIntitule("administrateur");
+                return profilRepository.save(administrateur);
+            });
 
             profilRepository.findByIntitule("chef").orElseGet(() -> {
-                Profil p = new Profil();
-                p.setIntitule("chef");
-                return profilRepository.save(p);
+                Profil chef = new Profil();
+                chef.setIntitule("chef");
+                return profilRepository.save(chef);
             });
 
             profilRepository.findByIntitule("agent").orElseGet(() -> {
-                Profil p = new Profil();
-                p.setIntitule("agent");
-                return profilRepository.save(p);
+                Profil agent = new Profil();
+                agent.setIntitule("agent");
+                return profilRepository.save(agent);
+            });
+
+            sexeRepository.findByIntitule("Homme").orElseGet(() ->{
+                Sexe homme = new Sexe();
+                homme.setIntitule("Homme");
+                return sexeRepository.save(homme);
+            });
+            sexeRepository.findByIntitule("Femme").orElseGet(() ->{
+                Sexe femme = new Sexe();
+                femme.setIntitule("Femme");
+                return sexeRepository.save(femme);
+            });
+            statutMatrimonialRepository.findByIntitule("Marié(e)").orElseGet(() ->{
+                StatutMatrimonial marié = new StatutMatrimonial();
+                marié.setIntitule("Marié(e)");
+                return statutMatrimonialRepository.save(marié);
+            });
+            statutMatrimonialRepository.findByIntitule("Célibrataire").orElseGet(() ->{
+                StatutMatrimonial célibataire = new StatutMatrimonial();
+                célibataire.setIntitule("Célibrataire");
+                return statutMatrimonialRepository.save(célibataire);
+            });
+            statutMatrimonialRepository.findByIntitule("Divorcé(e)").orElseGet(() ->{
+                StatutMatrimonial divorcé = new StatutMatrimonial();
+                divorcé.setIntitule("Divorcé(e)");
+                return statutMatrimonialRepository.save(divorcé);
+            });
+            statutMatrimonialRepository.findByIntitule("Veuf(ve)").orElseGet(() ->{
+                StatutMatrimonial veuf = new StatutMatrimonial();
+                veuf.setIntitule("Veuf(ve)");
+                return statutMatrimonialRepository.save(veuf);
             });
 
             if (utilisateurRepository.findByEmail(adminEmail).isEmpty()) {

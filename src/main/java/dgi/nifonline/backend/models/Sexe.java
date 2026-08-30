@@ -11,14 +11,14 @@ import lombok.Setter;
 
 
 @Entity
-@Table(name="profil")
+@Table(name="sexe")
 @Getter @Setter
-public class Profil {
+public class Sexe {
     
     @Id
     @GeneratedValue(strategy= GenerationType.IDENTITY)
-    @Column(name="id_profil")
-    private Long idProfil;
+    @Column(name="id_sexe")
+    private Long idSexe;
 
     @Column(name = "intitule")
     private String intitule;
