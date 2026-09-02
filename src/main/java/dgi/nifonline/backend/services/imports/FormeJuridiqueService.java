@@ -8,6 +8,8 @@ import dgi.nifonline.backend.utils.CSVUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -19,12 +21,13 @@ public class FormeJuridiqueService {
         this.formeJuridiqueRepository = formeJuridiqueRepository;
     }
 
+    @Transactional
     public ImportReportDTO importer(String chemin) throws Exception {
         List<String[]> lignes = CSVUtil.lireCSV(chemin, 4);
         int succes = 0;
         int echec = 0;
         StringBuilder message = new StringBuilder();
-
+        List<FormeJuridique> formesToInsert = new ArrayList<>();
         int lineNumber = 1;
         for (String[] valeurs : lignes) {
             FormeJuridiqueDTO dto = new FormeJuridiqueDTO(valeurs[0].trim(), valeurs[1].trim(), valeurs[2].trim(), valeurs[3].trim());
@@ -46,8 +49,7 @@ public class FormeJuridiqueService {
                     } else {
                         formeJuridique.setEtat(-1);
                     }
-
-                    formeJuridiqueRepository.save(formeJuridique);
+                    formesToInsert.add(formeJuridique);
                     succes++;
                     message.append("Succès: Ligne ").append(lineNumber).append(" → FormeJuridique '").append(dto.getIntitule()).append("' insérée avec succès.\n");
                 }
@@ -57,6 +59,12 @@ public class FormeJuridiqueService {
             }
             lineNumber++;
         }
+        if (echec > 0) {
+            return new ImportReportDTO(lignes.size(), succes, echec, message.toString());
+        }else{
+            message.append("Succès: Import terminé! - "+lignes.size()+" données insérées.");
+        }
+        formeJuridiqueRepository.saveAll(formesToInsert);
         return new ImportReportDTO(lignes.size(), succes, echec, message.toString());
     }
 

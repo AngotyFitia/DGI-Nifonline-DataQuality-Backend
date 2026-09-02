@@ -6,8 +6,9 @@ import dgi.nifonline.backend.models.Secteur;
 import dgi.nifonline.backend.repositories.SecteurRepository;
 import dgi.nifonline.backend.utils.CSVUtil;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.util.ArrayList;
 
 @Service
 public class SecteurService {
@@ -17,19 +18,19 @@ public class SecteurService {
     public SecteurService(SecteurRepository secteurRepository) {
         this.secteurRepository = secteurRepository;
     }
-
+    
+    @Transactional
     public ImportReportDTO importer(String chemin) throws Exception {
         List<String[]> lignes = CSVUtil.lireCSV(chemin, 3);
         int succes = 0;
         int echec = 0;
         StringBuilder message = new StringBuilder();
-
+        List<Secteur> secteursToInsert = new ArrayList<>();
         int lineNumber = 1;
         for (String[] valeurs : lignes) {
             SecteurDTO dto = new SecteurDTO(valeurs[0].trim(), valeurs[1].trim(), valeurs[2].trim());
             try {
                 dto.validate(lineNumber);
-
                 if (secteurRepository.findByIntitule(dto.getIntitule()).isPresent()) {
                     echec++;
                     message.append("Échec: Ligne ").append(lineNumber).append(" → Secteur '").append(dto.getIntitule()).append("' existe déjà.\n");
@@ -44,10 +45,8 @@ public class SecteurService {
                     } else {
                         secteur.setEtat(-1);
                     }
-
-                    secteurRepository.save(secteur);
+                    secteursToInsert.add(secteur);
                     succes++;
-                    message.append("Succès: Ligne ").append(lineNumber).append(" → Secteur '").append(dto.getIntitule()).append("' insérée avec succès.\n");
                 }
             } catch (Exception ex) {
                 echec++;
@@ -55,6 +54,12 @@ public class SecteurService {
             }
             lineNumber++;
         }
+        if (echec > 0) {
+            return new ImportReportDTO(lignes.size(), succes, echec, message.toString());
+        }else{
+            message.append("Succès: Import terminé! - "+lignes.size()+" données insérées.");
+        }
+        secteurRepository.saveAll(secteursToInsert);
         return new ImportReportDTO(lignes.size(), succes, echec, message.toString());
     }
 }

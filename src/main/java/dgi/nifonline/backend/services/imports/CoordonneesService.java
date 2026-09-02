@@ -10,7 +10,8 @@ import dgi.nifonline.backend.repositories.CommuneRepository;
 import dgi.nifonline.backend.repositories.DistrictRepository;
 import dgi.nifonline.backend.utils.CSVUtil;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -26,12 +27,13 @@ public class CoordonneesService {
         this.districtRepository = districtRepository;
     }
 
+    @Transactional
     public ImportReportDTO importer(String chemin) throws Exception {
         List<String[]> lignes = CSVUtil.lireCSV(chemin, 11);
         int succes = 0;
         int echec = 0;
         StringBuilder message = new StringBuilder();
-
+        List<Coordonnees> coordonneeesToInsert = new ArrayList<>();
         int lineNumber = 1;
         for (String[] valeurs : lignes) {
             CoordonneesDTO dto = new CoordonneesDTO(valeurs[0].trim(), valeurs[1].trim(), valeurs[2].trim(), valeurs[3].trim(), valeurs[4].trim(), valeurs[5].trim(), valeurs[6].trim(), Integer.parseInt(valeurs[7]), Double.parseDouble(valeurs[8]), Double.parseDouble(valeurs[9]), valeurs[10]);
@@ -55,8 +57,7 @@ public class CoordonneesService {
                 } else {
                     coordonnees.setEtat(-1);
                 }
-
-                coordonneesRepository.save(coordonnees);
+                coordonneeesToInsert.add(coordonnees);
                 succes++;
                 message.append("Succès: Ligne ").append(lineNumber).append(" → Coordonnees '").append(dto.getEmail()).append("' insérée avec succès.\n");
             } catch (Exception ex) {
@@ -65,6 +66,12 @@ public class CoordonneesService {
             }
             lineNumber++;
         }
+        if (echec > 0) {
+            return new ImportReportDTO(lignes.size(), succes, echec, message.toString());
+        }else{
+            message.append("Succès: Import terminé! - "+lignes.size()+" données insérées.");
+        }
+        coordonneesRepository.saveAll(coordonneeesToInsert);
         return new ImportReportDTO(lignes.size(), succes, echec, message.toString());
     }
 }

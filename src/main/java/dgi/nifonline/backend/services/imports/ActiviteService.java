@@ -8,7 +8,8 @@ import dgi.nifonline.backend.repositories.ActiviteRepository;
 import dgi.nifonline.backend.repositories.SecteurRepository;
 import dgi.nifonline.backend.utils.CSVUtil;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -22,24 +23,27 @@ public class ActiviteService {
         this.secteurRepository = secteurRepository;
     }
 
+    @Transactional
     public ImportReportDTO importer(String chemin) throws Exception {
         List<String[]> lignes = CSVUtil.lireCSV(chemin, 5);
         int succes = 0;
         int echec = 0;
         StringBuilder message = new StringBuilder();
-
+        List<Activite> activitesToInsert = new ArrayList<>();
         int lineNumber = 1;
         for (String[] valeurs : lignes) {
-            ActiviteDTO dto = new ActiviteDTO(valeurs[0].trim(), valeurs[1].trim(), valeurs[2].trim(), valeurs[3].trim(), valeurs[4].trim());
+            ActiviteDTO dto = new ActiviteDTO(valeurs[0].trim(),valeurs[1].trim(),valeurs[2].trim(),valeurs[3].trim(),valeurs[4].trim());
             try {
                 dto.validate(lineNumber);
-                Secteur secteur = secteurRepository.findByIntitule(dto.getSecteurIntitule()) .orElse(null);
+                Secteur secteur = secteurRepository.findByIntitule(dto.getSecteurIntitule()).orElse(null);
                 if (secteur == null) {
                     echec++;
-                    message.append("Échec: Ligne ").append(lineNumber).append(" → Secteur '").append(dto.getSecteurIntitule()).append("' inexistant.\n");
+                    message.append("Échec: Ligne ").append(lineNumber)
+                        .append(" → Secteur '").append(dto.getSecteurIntitule()).append("' inexistant.\n");
                 } else if (activiteRepository.findByIntituleAndSecteurAndSection(dto.getIntitule(), secteur, dto.getSection()).isPresent()) {
                     echec++;
-                    message.append("Échec: Ligne ").append(lineNumber).append(" → Activite '").append(dto.getIntitule()).append("' existe déjà.\n");
+                    message.append("Échec: Ligne ").append(lineNumber)
+                        .append(" → Activite '").append(dto.getIntitule()).append("' existe déjà.\n");
                 } else {
                     Activite activite = new Activite();
                     activite.setIntitule(dto.getIntitule());
@@ -53,9 +57,8 @@ public class ActiviteService {
                     } else {
                         activite.setEtat(-1);
                     }
-                    activiteRepository.save(activite);
+                    activitesToInsert.add(activite);
                     succes++;
-                    message.append("Succès: Ligne ").append(lineNumber).append(" → Activite '").append(dto.getIntitule()).append("' insérée avec succès dans le secteur '").append(secteur.getIntitule()).append("'.\n");
                 }
             } catch (Exception ex) {
                 echec++;
@@ -63,6 +66,12 @@ public class ActiviteService {
             }
             lineNumber++;
         }
+        if (echec > 0) {
+            return new ImportReportDTO(lignes.size(), succes, echec, message.toString());
+        }else{
+            message.append("Succès: Import terminé! - "+lignes.size()+" données insérées.");
+        }
+        activiteRepository.saveAll(activitesToInsert);
         return new ImportReportDTO(lignes.size(), succes, echec, message.toString());
     }
 

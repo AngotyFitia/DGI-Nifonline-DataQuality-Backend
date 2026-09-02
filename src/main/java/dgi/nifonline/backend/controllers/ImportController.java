@@ -4,6 +4,7 @@ import dgi.nifonline.backend.dtos.imports.ImportReportDTO;
 import dgi.nifonline.backend.dtos.imports.RegimeFiscalDTO;
 import dgi.nifonline.backend.dtos.imports.FormeJuridiqueDTO;
 import dgi.nifonline.backend.dtos.imports.TypeImpotDTO;
+import dgi.nifonline.backend.dtos.imports.PersonnePhysiqueDTO;
 import dgi.nifonline.backend.services.imports.ProvinceService;
 import dgi.nifonline.backend.services.imports.RegionService;
 import dgi.nifonline.backend.services.imports.DistrictService;
@@ -15,6 +16,7 @@ import dgi.nifonline.backend.services.imports.RegimeFiscalService;
 import dgi.nifonline.backend.services.imports.FormeJuridiqueService;
 import dgi.nifonline.backend.services.imports.TypeImpotService;
 import dgi.nifonline.backend.services.imports.CentreGestionnaireService;
+import dgi.nifonline.backend.services.imports.PersonnePhysiqueService;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,7 +27,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
-
+import java.util.List;
 import java.io.File;
 
 @RestController
@@ -43,6 +45,7 @@ public class ImportController {
     private final TypeImpotService typeImpotService;
     private final CoordonneesService coordonneesService;
     private final CentreGestionnaireService centreGestionnaireService;
+    private final PersonnePhysiqueService personnePhysiqueService;
 
     public ImportController(ProvinceService provinceService, RegionService regionService, 
                             DistrictService districtService, CommuneService communeService, 
@@ -50,7 +53,8 @@ public class ImportController {
                             RegimeFiscalService regimeFiscalService, 
                             FormeJuridiqueService formeJuridiqueService, 
                             TypeImpotService typeImpotService, CoordonneesService coordonneesService,
-                            CentreGestionnaireService centreGestionnaireService) {
+                            CentreGestionnaireService centreGestionnaireService, 
+                            PersonnePhysiqueService personnePhysiqueService) {
         this.provinceService = provinceService;
         this.regionService= regionService;
         this.districtService=  districtService;
@@ -62,6 +66,7 @@ public class ImportController {
         this.typeImpotService= typeImpotService;
         this.coordonneesService= coordonneesService;
         this.centreGestionnaireService=centreGestionnaireService;
+        this.personnePhysiqueService=personnePhysiqueService;
     }
 
     @PostMapping("/provinces")
@@ -237,6 +242,29 @@ public class ImportController {
         } catch (Exception e) {
             return new ImportReportDTO(0, 0, 0, "Erreur lors de l'import : " + e.getMessage());
         }
+    }
+
+    @PostMapping("/personnes-physiques")
+    @PreAuthorize("hasAuthority('chef')")
+    public ImportReportDTO importPersonnesPhysiques(@RequestParam("coordFile") MultipartFile coordFile,
+                                                    @RequestParam("persFile") MultipartFile persFile) {
+        try {
+            File tempCoord = File.createTempFile("coordonnees", ".csv");
+            coordFile.transferTo(tempCoord);
+
+            File tempPers = File.createTempFile("personnes", ".csv");
+            persFile.transferTo(tempPers);
+
+            return personnePhysiqueService.importer(tempCoord.getAbsolutePath(), tempPers.getAbsolutePath());
+        } catch (Exception e) {
+            return new ImportReportDTO(0, 0, 0, "Erreur lors de l'import : " + e.getMessage());
+        }
+    }
+
+    @GetMapping("liste/personnes-physiques")
+    @PreAuthorize("hasAuthority('chef')")
+    public List<PersonnePhysiqueDTO> getAll() {
+        return personnePhysiqueService.getAllPersonnesPhysiques();
     }
 
 }

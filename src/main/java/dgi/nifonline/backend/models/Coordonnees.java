@@ -21,19 +21,19 @@ public class Coordonnees {
     @Column(name="id_coordonnees")
     private Long idCoordonnees;
 
-    @Column(name="email", nullable=false, length=255)
+    @Column(name="email", nullable=false, columnDefinition="TEXT")
     private String email;
 
-    @Column(name="telephone", nullable=false, length=10)
+    @Column(name="telephone", nullable=false, length=20)
     private String telephone;
 
-    @Column(name = "telephone_secondaire", nullable=true, length=10)
+    @Column(name = "telephone_secondaire", nullable=true, length=20)
     private String telephoneSecondaire;
 
     @Column(name="site_web", nullable=true, length=255)
     private String siteWeb;
 
-    @Column(name="adresse", nullable=false, length=255)
+    @Column(name="adresse", nullable=false, columnDefinition="TEXT")
     private String adresse;
 
     @Column(name="code_postal", nullable=false)

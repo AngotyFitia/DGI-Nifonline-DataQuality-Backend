@@ -10,7 +10,6 @@ import org.springframework.data.domain.PageRequest;
 import java.util.List;
 import java.time.LocalDateTime;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 @Repository
 public interface UtilisateurRepository extends JpaRepository<Utilisateur, Long> {

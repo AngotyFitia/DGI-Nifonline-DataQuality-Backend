@@ -22,7 +22,7 @@ public class RegisterRequestDTO {
              message = "Votre mot de passe doit contenir au moins une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial")
     private String motDePasse;
 
-    @NotEmpty(message = "Veuillez confirmer que vous n'êtes pas un robot.")
+    // @NotEmpty(message = "Veuillez confirmer que vous n'êtes pas un robot.")
     private String recaptchaToken;
 
     @NotNull(message = "Veuillez sélectionner votre rôle.")

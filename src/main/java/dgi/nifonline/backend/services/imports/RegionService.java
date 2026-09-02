@@ -8,7 +8,8 @@ import dgi.nifonline.backend.repositories.RegionRepository;
 import dgi.nifonline.backend.repositories.ProvinceRepository;
 import dgi.nifonline.backend.utils.CSVUtil;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -22,12 +23,13 @@ public class RegionService {
         this.provinceRepository = provinceRepository;
     }
 
+    @Transactional
     public ImportReportDTO importer(String chemin) throws Exception {
         List<String[]> lignes = CSVUtil.lireCSV(chemin, 3);
         int succes = 0;
         int echec = 0;
         StringBuilder message = new StringBuilder();
-
+        List<Region> regionsToInsert = new ArrayList<>();
         int lineNumber = 1;
         for (String[] valeurs : lignes) {
             RegionDTO dto = new RegionDTO(valeurs[0].trim(), valeurs[1].trim(), valeurs[2].trim());
@@ -57,8 +59,7 @@ public class RegionService {
                     } else {
                         region.setEtat(-1);
                     }
-
-                    regionRepository.save(region);
+                    regionsToInsert.add(region);
                     succes++;
                     message.append("Succès: Ligne ").append(lineNumber).append(" → Région '").append(dto.getIntitule()).append("' insérée avec succès.\n");
                 }
@@ -68,6 +69,12 @@ public class RegionService {
             }
             lineNumber++;
         }
+        if (echec > 0) {
+            return new ImportReportDTO(lignes.size(), succes, echec, message.toString());
+        }else{
+            message.append("Succès: Import terminé! - "+lignes.size()+" données insérées.");
+        }
+        regionRepository.saveAll(regionsToInsert);
         return new ImportReportDTO(lignes.size(), succes, echec, message.toString());
     }
 }

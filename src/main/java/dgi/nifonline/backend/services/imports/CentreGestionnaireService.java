@@ -8,7 +8,8 @@ import dgi.nifonline.backend.repositories.CoordonneesRepository;
 import dgi.nifonline.backend.repositories.CentreGestionnaireRepository;
 import dgi.nifonline.backend.utils.CSVUtil;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -22,12 +23,13 @@ public class CentreGestionnaireService {
         this.centreGestionnaireRepository = centreGestionnaireRepository;
     }
 
+    @Transactional
     public ImportReportDTO importer(String chemin) throws Exception {
         List<String[]> lignes = CSVUtil.lireCSV(chemin, 6);
         int succes = 0;
         int echec = 0;
         StringBuilder message = new StringBuilder();
-
+        List<CentreGestionnaire> centresToInsert = new ArrayList<>();
         int lineNumber = 1;
         for (String[] valeurs : lignes) {
             CentreGestionnaireDTO dto = new CentreGestionnaireDTO(valeurs[0].trim(), valeurs[1].trim(), valeurs[2].trim(), valeurs[3].trim(), valeurs[4].trim(), valeurs[5].trim());
@@ -50,8 +52,7 @@ public class CentreGestionnaireService {
                     } else {
                         centreGestionnaire.setEtat(-1);
                     }
-    
-                    centreGestionnaireRepository.save(centreGestionnaire);
+                    centresToInsert.add(centreGestionnaire);
                     succes++;
                     message.append("Succès: Ligne ").append(lineNumber).append(" → CentreGestionnaire '").append(dto.getNom()).append("' insérée avec succès.\n");
                 }
@@ -61,6 +62,12 @@ public class CentreGestionnaireService {
             }
             lineNumber++;
         }
+        if (echec > 0) {
+            return new ImportReportDTO(lignes.size(), succes, echec, message.toString());
+        }else{
+            message.append("Succès: Import terminé! - "+lignes.size()+" données insérées.");
+        }
+        centreGestionnaireRepository.saveAll(centresToInsert);
         return new ImportReportDTO(lignes.size(), succes, echec, message.toString());
     }
 }
